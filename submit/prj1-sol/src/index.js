@@ -91,8 +91,8 @@ function form(meta, path, $element) {
     event.preventDefault();
     const $form = $(this);
     //@TODO
-    // const results = ...;
-    // console.log(JSON.stringify(results, null, 2));
+    //const results = ...;
+    console.log(JSON.stringify(results, null, 2));
   });
 }
 
@@ -104,6 +104,18 @@ function header(meta, path, $element) {
 
 function input(meta, path, $element) {
   //@TODO
+  $element.append(makeElement('span', meta.attr).text(meta.text));
+  //const $input = items('input', meta, path, $element);
+  // if (type === 'hidden') {
+  //   const $input = items('hidden', meta, path, $element);
+  // }
+  // else {
+  //   const $input = items('input', meta, path, $element);
+  // }
+
+
+  const $input = items('input', meta, path, $element);
+
 }
 
 function link(meta, path, $element) {
@@ -115,6 +127,10 @@ function link(meta, path, $element) {
 
 function multiSelect(meta, path, $element) {
   //@TODO
+  //$element.append(makeElement('radio', meta.attr).text(meta.text));
+
+  $element.append(makeElement('span', meta.attr).text(meta.text));
+  const $multiSelect = items('chosen-select', meta, path, $element);
 }
 
 function para(meta, path, $element) { items('p', meta, path, $element); }
@@ -131,14 +147,28 @@ function segment(meta, path, $element) {
 
 function submit(meta, path, $element) {
   //@TODO
+  //$element.append(makeElement('span', meta.attr).text(meta.text));
+  if (meta.text === undefined) {
+    const $submit =  items('button', meta, path, $element).append(makeElement('span', meta.attr).text("Submit"));
+  }
+  else{
+  const $submit = items('button', meta, path, $element).append(makeElement('span', meta.attr).text(meta.text));
+  }
 }
 
 function uniSelect(meta, path, $element) {
   //@TODO
+  $element.append(makeElement('span', meta.attr).text(meta.text));
+  if(meta.items.text === 'Digits'){
+    $element.append(makeElement('radio', meta.attr).text(meta.text));
+  }
+  else {
+    const $uniSelect = items('select', meta, path, $element);
+  }
 }
 
 
-//map from type to type handling function.  
+//map from type to type handling function.
 const FNS = {
   block,
   form,
