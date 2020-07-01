@@ -66,7 +66,7 @@ export default {
     N_UNI_SELECT: 5,
     N_MULTI_SELECT: 6,
   },
-  
+
   _: {
     type: 'block',
     items: [
@@ -255,7 +255,7 @@ export default {
 	    chkFn(val, info, meta) { return val.match(/^\w+$/); },
 	    errMsgFn(val, info, meta) {
 	      return `Field ${info.text} must contain ${info.attr.title}.`;
-	    },	      
+	    },
 	  },
 	  { type: 'input',
             attr: {
@@ -266,7 +266,7 @@ export default {
 	    chkFn(val, info, meta) { return val.match(/^\w+$/); },
 	    errMsgFn(val, info, meta) {
 	      return `Field ${info.text} must contain ${info.attr.title}.`;
-	    },	      
+	    },
 	  },
 	  { type: 'input',
 	    subType: 'number',
