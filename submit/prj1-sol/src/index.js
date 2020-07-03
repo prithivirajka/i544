@@ -93,6 +93,7 @@ function form(meta, path, $element) {
     const results = $( this ).serializeArray();
     let res = {};
     for (let i=0; i<results.length; i++) {
+      //const results_1 = (results[i].name + ":" + results[i].value);
       var aa = $('[name='+results[i].name+']', $form);
       if($(aa).attr("multiple") || $(aa).attr("type") === "checkbox") {
         if(res[results[i].name]) {
@@ -133,11 +134,16 @@ function input(meta, path, $element) {
   }
   const $div = makeElement('div', {})
   const $input = makeElement('input', meta.attr);
+  // let erid = {"class":"error", "id":id+"-err"}
+  // const $error = makeElement('div', erid);
   $div.append($input);
+  // $div.append($error);
   if(meta.required)
   {
+    //let erid = {"class":"error", "id":id+"-err"}
     let erid = {"class":"error", "id":id+"-err"}
     const reqWordMsgDiv = makeElement('div', erid);
+    //$(reqWordMsgDiv).addClass("error");
     $div.append(reqWordMsgDiv);
     $input.blur(function()
     {
@@ -151,6 +157,7 @@ function reqFieldBlur(meta, inpEle)
 {
   if(!$(inpEle).val().trim()) {
     $(inpEle).next().text("The field "+ meta.text +" must be specified.");
+    //$(inpEle).next().text("Field " + meta.text);
   } else
   {
     $(inpEle).next().text("");
@@ -197,7 +204,12 @@ function multiSelect(meta, path, $element) {
     let ty = {"multiple":"multiple"}
     const ta = Object.assign({}, meta.attr, ty)
     const $div_1 = makeElement('select', ta)
+    //$($div_1).addClass("fieldset");
     for (let i=0; i<meta.items.length; i++) {
+      // let va = meta.items[i].text
+      // let type = {"value": meta.items[i].text}
+      // const te = Object.assign({}, type)
+      // const $opt = makeElement('option', te).text(meta.items[i].text);
       let $opt = opt_select_1(meta,i)
       $div_1.append($opt)
       $div.append($div_1)
