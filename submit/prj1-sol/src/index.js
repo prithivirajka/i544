@@ -90,9 +90,21 @@ function form(meta, path, $element) {
   $form.submit(function(event) {
     event.preventDefault();
     const $form = $(this);
-    //@TODO
-    //const results = ...;
-    //console.log(JSON.stringify(results, null, 2));
+    const results = $( this ).serializeArray();
+    let res = {};
+    for (let i=0; i<results.length; i++) {
+      var aa = $('[name='+results[i].name+']', $form);
+      if($(aa).attr("multiple") || $(aa).attr("type") === "checkbox") {
+        if(res[results[i].name]) {
+          res[results[i].name].push(results[i].value);
+        } else {
+          res[results[i].name] = [results[i].value];
+        }
+      } else {
+        res[results[i].name] = results[i].value;
+      }
+    }
+    console.log(JSON.stringify(res, null, 2));
   });
 }
 
@@ -110,40 +122,36 @@ function input(meta, path, $element) {
   }else{
     text = meta.text
   }
-  //console.log(text)
   let id;
   id = makeId(path)
   const $label = makeElement('label', {for:id}).text(text)
   $element.append($label)
-  if (meta.subTypetext === undefined) {
+  if (meta.subType === undefined) {
     Object.assign(meta.attr,{"id":id,type:"text"})
   } else {
-    Object.assign(meta.attr,{"id":id,type:meta.subTypetext})
+    Object.assign(meta.attr,{"id":id,type:meta.subType})
   }
   const $div = makeElement('div', {})
   const $input = makeElement('input', meta.attr);
   $div.append($input);
   if(meta.required)
   {
-    const reqWordMsgDiv = $("<div>");
-    $(reqWordMsgDiv).addClass("error");
+    let erid = {"class":"error", "id":id+"-err"}
+    const reqWordMsgDiv = makeElement('div', erid);
     $div.append(reqWordMsgDiv);
     $input.blur(function()
     {
-      reqFieldBlur(this);
+      reqFieldBlur(meta,this);
     });
   }
-
   $element.append($div)
 }
 
-function reqFieldBlur(inpEle)
+function reqFieldBlur(meta, inpEle)
 {
-  if(!$(inpEle).val().trim())
-  {
-    $(inpEle).next().text("The field Required Word must be specified.");
-  }
-  else
+  if(!$(inpEle).val().trim()) {
+    $(inpEle).next().text("The field "+ meta.text +" must be specified.");
+  } else
   {
     $(inpEle).next().text("");
   }
@@ -158,9 +166,15 @@ function link(meta, path, $element) {
 
 function multiSelect(meta, path, $element) {
   //@TODO
+  let text;
+  if (meta.required === true) {
+    text = meta.text+"*"
+  }else{
+    text = meta.text
+  }
   if (meta.items.length < (N_MULTI_SELECT || 4) ) {
     let id = makeId(path)
-    const $label = makeElement('label', {for:id}).text(meta.text)
+    const $label = makeElement('label', {for:id}).text(text)
     $element.append($label)
     const $div = makeElement('div', {})
     const $div_1 = makeElement('div', {})
@@ -177,19 +191,14 @@ function multiSelect(meta, path, $element) {
   }
   else if (meta.items.length > (N_UNI_SELECT || 4)) {
     let id = makeId(path)
-    const $label = makeElement('label', {for:id}).text(meta.text)
+    const $label = makeElement('label', {for:id}).text(text)
     $element.append($label)
     const $div = makeElement('div', {})
-
     let ty = {"multiple":"multiple"}
     const ta = Object.assign({}, meta.attr, ty)
     const $div_1 = makeElement('select', ta)
-    //$($div_1).addClass("fieldset");
     for (let i=0; i<meta.items.length; i++) {
-      let va = meta.items[i].text
-      let type = {"value": meta.items[i].text}
-      const te = Object.assign({}, type)
-      const $opt = makeElement('option', te).text(meta.items[i].text);
+      let $opt = opt_select_1(meta,i)
       $div_1.append($opt)
       $div.append($div_1)
       $element.append($div)
@@ -201,7 +210,7 @@ function para(meta, path, $element) { items('p', meta, path, $element); }
 
 function segment(meta, path, $element) {
   if (meta.text !== undefined) {
-    $element.append(makeElement('span', meta.attr));
+    $element.append(makeElement('span', meta.attr)).text(meta.text);
   }
   else {
     items('span', meta, path, $element);
@@ -218,20 +227,25 @@ function submit(meta, path, $element) {
   $element.append($button)
 }
 
-function option(meta, path, $element,index){
-
-    // const $e = makeElement('option', meta.attr).text(meta.items[i].key));
-    // return $e
-    // console.log("inside option");
+function opt_select_1(meta,i) {
+  let va = meta.items[i].text
+  let type = {"value": meta.items[i].key}
+  const te = Object.assign({}, type)
+  const $opt = makeElement('option', te).text(meta.items[i].text);
+  return $opt
 }
 
 function uniSelect(meta, path, $element) {
   //@TODO
+  let text;
+  if (meta.required === true) {
+    text = meta.text+"*"
+  }else{
+    text = meta.text
+  }
   if (meta.items.length < (N_UNI_SELECT || 4) ) {
-    // console.log(meta.items.length);
-    // console.log(meta.items);
       let id = makeId(path)
-      const $label = makeElement('label', {for:id}).text(meta.text)
+      const $label = makeElement('label', {for:id}).text(text)
       $element.append($label)
       const $div = makeElement('div', {})
       const $div_1 = makeElement('div', {});
@@ -243,24 +257,42 @@ function uniSelect(meta, path, $element) {
         const $label_1 = makeElement('label', {for:id}).text(meta.items[i].key)
         $div_1.append($label_1, $input)
         $div.append($div_1)
+        if(meta.required)
+        {
+          let erid = {"class":"error", "id":id+"-err"}
+          const reqWordMsgDiv = makeElement('div', erid);
+          $(reqWordMsgDiv).addClass("error");
+          $div.append(reqWordMsgDiv);
+          $input.blur(function()
+          {
+            reqFieldBlur(meta, this);
+          });
+        }
         $element.append($div)
       }
   }
   else if (meta.items.length > (N_UNI_SELECT || 4)) {
     let id = makeId(path)
-    const $label = makeElement('label', {for:id}).text(meta.text)
+    const $label = makeElement('label', {for:id}).text(text)
     $element.append($label)
     const $div = makeElement('div', {})
     const ta = Object.assign({}, meta.attr)
     const $div_1 = makeElement('select', ta)
-    //$($div_1).addClass("fieldset");
     for (let i=0; i<meta.items.length; i++) {
-      let va = meta.items[i].text
-      let type = {"value": meta.items[i].text}
-      const te = Object.assign({}, type)
-      const $opt = makeElement('option', te).text(meta.items[i].text);
+      let $opt = opt_select_1(meta,i)
       $div_1.append($opt)
       $div.append($div_1)
+      if(meta.required)
+      {
+        let erid = {"class":"error", "id":id+"-err"}
+        const reqWordMsgDiv = makeElement('div', erid);
+        $(reqWordMsgDiv).addClass("error");
+        $div.append(reqWordMsgDiv);
+        $opt.blur(function()
+        {
+          reqFieldBlur(meta, this);
+        });
+      }
       $element.append($div)
     }
   }
@@ -278,7 +310,7 @@ const FNS = {
   segment,
   submit,
   uniSelect,
-  option,
+  opt_select_1,
 };
 
 /*************************** Top-Level Code ****************************/
