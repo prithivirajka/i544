@@ -1,0 +1,618 @@
+#Annotated Log.  Note that some commands were deleted, others moved around
+
+#show usage message
+$ ./index.mjs
+usage: index.mjs MONGO_DB_URL COMMAND
+  where COMMAND is one of 
+  add-book    NAME=VALUE...
+      create or update a book
+  cart-item   NAME=VALUE...
+      update/create/delete cart item
+  clear       
+      clear model database
+  find-books  NAME=VALUE...
+      return list of books with specified isbn and titleAuthors
+  get-cart    NAME=VALUE...
+      find cart with specific cartId
+  help        
+      print this help message
+  load-books  DATA_FILE_PATH
+      load books in file at DATA_FILE_PATH into model
+  new-cart    NAME=VALUE...
+      create a new shopping cart, returning cart id
+
+#clear data
+$ ./index.mjs mongodb://localhost:27017/books clear
+
+#add a book, using _json shortcut to read fields from file rather than
+#specifying individually
+$ ./index.mjs mongodb://localhost:27017/books add-book \
+     _json=$HOME/cs544/data/book.json 
+"311-684-647-4"
+
+#look for book by isbn
+$ ./index.mjs mongodb://localhost:27017/books find-books isbn=311-684-647-4
+[
+  {
+    "_lastModified": "2020-06-29T01:37:29.511Z",
+    "authors": [
+      "Garibay, Tarah",
+      "Weinberg, Maureen",
+      "Wolterman, Javion"
+    ],
+    "isbn": "311-684-647-4",
+    "pages": 459,
+    "publisher": "New Starch",
+    "title": "The Idiot's Guide to JavaScript",
+    "year": 2020
+  }
+]
+
+#create a new shopping cart
+$ ./index.mjs mongodb://localhost:27017/books new-cart
+"0.7876622361511156"
+
+#access cart
+$ ./index.mjs mongodb://localhost:27017/books get-cart
+:MISSING_FIELD: missing fields "Shopping Cart ID".
+$ ./index.mjs mongodb://localhost:27017/books get-cart cartId=0.7876622361511156
+{ _lastModified: 2020-06-29T01:39:26.306Z }
+
+#add 2 units of single book in database
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=0.7876622361511156 \
+     sku=311-684-647-4 nUnits=2
+
+#book specified by sku must exist (note the extra 4 in the sku)
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=0.7876622361511156 \
+     sku=311-684-647-44 nUnits=2
+sku:BAD_ID: unknown sku 311-684-647-44
+
+$ ./index.mjs mongodb://localhost:27017/books get-cart cartId=0.7876622361511156
+{ _lastModified: 2020-06-29T01:41:03.875Z, '311-684-647-4': 2 }
+
+#update quantity of book in cart
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=0.7876622361511156 \
+     sku=311-684-647-4 nUnits=1
+
+#show updated cart
+$ ./index.mjs mongodb://localhost:27017/books get-cart cartId=0.7876622361511156
+{ _lastModified: 2020-06-29T01:42:00.556Z, '311-684-647-4': 1 }
+
+#setting nUnits to 0 effectively deletes
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=0.7876622361511156 \
+     sku=311-684-647-4 nUnits=0
+
+#show cart is empty
+$ ./index.mjs mongodb://localhost:27017/books get-cart cartId=0.7876622361511156
+{ _lastModified: 2020-06-29T01:42:15.925Z }
+
+#clear out all data
+$ ./index.mjs mongodb://localhost:27017/books clear
+
+#load 2000 books
+$ ./index.mjs mongodb://localhost:27017/books load-books ~/cs544/data/2000-books.json.gz 
+
+#invalid search
+$ ./index.mjs mongodb://localhost:27017/books find-books authorsTitle=APL
+authorsTitle:BAD_FIELD: unknown field authorsTitle for action findBooks
+
+# We have only a single book for language starting with letter A
+$ ./index.mjs mongodb://localhost:27017/books find-books authorsTitleSearch=APL
+[
+  {
+    "_lastModified": "2020-06-29T01:43:15.562Z",
+    "authors": [
+      "Wallace, Rubi",
+      "Davo, Lenora"
+    ],
+    "isbn": "267-767-559-0",
+    "pages": 368,
+    "publisher": "Manning",
+    "title": "The Idiot's Guide to APL",
+    "year": 2020
+  }
+]
+
+#3 books for languages starting with B
+$ ./index.mjs mongodb://localhost:27017/books find-books \
+     authorsTitleSearch=Bliss
+[
+  {
+    "_lastModified": "2020-06-29T01:43:15.361Z",
+    "authors": [
+      "Wolfkeil, Joey",
+      "Tharp, Yessenia"
+    ],
+    "isbn": "735-411-209-1",
+    "pages": 303,
+    "publisher": "Prentice-Hall",
+    "title": "Basics of Bliss Programming",
+    "year": 2014
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.771Z",
+    "authors": [
+      "Valenzuela, Mario",
+      "Wolk, Katelin"
+    ],
+    "isbn": "783-408-420-2",
+    "pages": 425,
+    "publisher": "Pearson",
+    "title": "Fundamentals of Bliss Programming",
+    "year": 2004
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.875Z",
+    "authors": [
+      "Anderson, Yair",
+      "Jamar, Joey"
+    ],
+    "isbn": "758-807-384-9",
+    "pages": 520,
+    "publisher": "Manning",
+    "title": "The Idiot's Guide to Bliss",
+    "year": 2007
+  }
+]
+
+#5 books for languages starting with C.  Note that I tried to search
+#for "C", but got "Objective-C" because the search is based on
+#words in authors or title.
+$ ./index.mjs mongodb://localhost:27017/books find-books authorsTitleSearch=C
+[
+  {
+    "_lastModified": "2020-06-29T01:43:15.355Z",
+    "authors": [
+      "Waid, Jack",
+      "Whelan, Raequan",
+      "Curlee, Candy",
+      "Wisniewski, Tarah"
+    ],
+    "isbn": "208-511-071-3",
+    "pages": 476,
+    "publisher": "Prentice-Hall",
+    "title": "Advanced Objective-C Programming",
+    "year": 2017
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.535Z",
+    "authors": [
+      "Chamlee, Derrick",
+      "Stoye, Lori",
+      "Waller, Jabari"
+    ],
+    "isbn": "043-229-749-1",
+    "pages": 118,
+    "publisher": "Pearson",
+    "title": "Advanced Objective-C Programming",
+    "year": 2001
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.651Z",
+    "authors": [
+      "Stoye, Kaleb",
+      "Valenzuela, Mario"
+    ],
+    "isbn": "402-776-555-3",
+    "pages": 189,
+    "publisher": "Manning",
+    "title": "Advanced Objective-C Programming",
+    "year": 2010
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.692Z",
+    "authors": [
+      "Wiegert, Joyce",
+      "Tharp, Gordon",
+      "Truax, Rebekah"
+    ],
+    "isbn": "541-025-523-1",
+    "pages": 579,
+    "publisher": "Addison-Wesley",
+    "title": "Advanced Objective-C Programming",
+    "year": 2002
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.700Z",
+    "authors": [
+      "Tirres, Bethany",
+      "Wiseman, Timothy"
+    ],
+    "isbn": "651-104-311-8",
+    "pages": 134,
+    "publisher": "Prentice-Hall",
+    "title": "Advanced Objective-C Programming",
+    "year": 2003
+  }
+]
+
+#Search for books with author wadley.  Note that number of results
+#may have been limited by default _count = 5
+$ ./index.mjs mongodb://localhost:27017/books find-books \
+     authorsTitleSearch='wadley'
+[
+  {
+    "_lastModified": "2020-06-29T01:43:15.711Z",
+    "authors": [
+      "Kirk, Klarisa",
+      "Izard, Quinton",
+      "Stinson, Albert",
+      "Wadley, Joan"
+    ],
+    "isbn": "037-288-083-5",
+    "pages": 444,
+    "publisher": "Prentice-Hall",
+    "title": "Basics of PL/I Programming",
+    "year": 2019
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.461Z",
+    "authors": [
+      "Wadley, Joan"
+    ],
+    "isbn": "890-973-557-8",
+    "pages": 513,
+    "publisher": "Manning",
+    "title": "Fundamentals of INTERCAL Programming",
+    "year": 2011
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.835Z",
+    "authors": [
+      "Freitag, Sheyla",
+      "Wadley, Joan"
+    ],
+    "isbn": "781-356-289-1",
+    "pages": 118,
+    "publisher": "Pearson",
+    "title": "PHP Programmers Reference",
+    "year": 2009
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.534Z",
+    "authors": [
+      "Fernandez, Cierra",
+      "Alvelais-Licon, Justyn",
+      "Walrod, Ricardo",
+      "Wadley, Joan"
+    ],
+    "isbn": "474-608-506-2",
+    "pages": 438,
+    "publisher": "Addison-Wesley",
+    "title": "PostgreSQL Prats and Pitfalls",
+    "year": 2011
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.725Z",
+    "authors": [
+      "Wadley, Joan",
+      "Duran, Kristyn",
+      "Wielinski, Zenia",
+      "Sigala, Tamia"
+    ],
+    "isbn": "101-902-716-6",
+    "pages": 377,
+    "publisher": "Prentice-Hall",
+    "title": "The Idiot's Guide to D",
+    "year": 2014
+  }
+]
+
+# Search for D language books: expect 6 results.  We use a large _count
+# to ensure we see all results
+$ ./index.mjs mongodb://localhost:27017/books find-books \
+     authorsTitleSearch=D _count=15
+[
+  {
+    "_lastModified": "2020-06-29T01:43:15.506Z",
+    "authors": [
+      "Tharp, Yessenia"
+    ],
+    "isbn": "818-644-973-1",
+    "pages": 99,
+    "publisher": "O'Reilly",
+    "title": "Basics of D Programming",
+    "year": 2001
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.657Z",
+    "authors": [
+      "Woodford, Alfredo",
+      "Chavez, Lindsay",
+      "Wolfkeil, Joey"
+    ],
+    "isbn": "587-415-971-1",
+    "pages": 577,
+    "publisher": "Pearson",
+    "title": "D Programmers Reference",
+    "year": 2016
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.514Z",
+    "authors": [
+      "Doubt, Aubrie",
+      "Evenski, Rhett",
+      "Gandy, Henry"
+    ],
+    "isbn": "198-190-051-4",
+    "pages": 428,
+    "publisher": "Prentice-Hall",
+    "title": "D Reference Manual",
+    "year": 2008
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.722Z",
+    "authors": [
+      "Alferez, Kaden",
+      "Fenton, Amelia",
+      "Weest, Dalton",
+      "Dildy, Brandy"
+    ],
+    "isbn": "718-569-364-8",
+    "pages": 187,
+    "publisher": "Addison-Wesley",
+    "title": "D: The Good Parts",
+    "year": 2004
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.788Z",
+    "authors": [
+      "Wysel, Kaytlin"
+    ],
+    "isbn": "100-024-008-6",
+    "pages": 555,
+    "publisher": "New Starch",
+    "title": "Fundamentals of D Programming",
+    "year": 2016
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.725Z",
+    "authors": [
+      "Wadley, Joan",
+      "Duran, Kristyn",
+      "Wielinski, Zenia",
+      "Sigala, Tamia"
+    ],
+    "isbn": "101-902-716-6",
+    "pages": 377,
+    "publisher": "Prentice-Hall",
+    "title": "The Idiot's Guide to D",
+    "year": 2014
+  }
+]
+
+#Languages starting with G: expect 11 results
+$ ./index.mjs mongodb://localhost:27017/books find-books
+     authorsTitleSearch=Go _count=15
+[
+  {
+    "_lastModified": "2020-06-29T01:43:15.858Z",
+    "authors": [
+      "Rains, Bailey"
+    ],
+    "isbn": "013-269-736-3",
+    "pages": 168,
+    "publisher": "O'Reilly",
+    "title": "Advanced Go Programming",
+    "year": 2015
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.686Z",
+    "authors": [
+      "Kelly, Kayleigh",
+      "Volmerding, Salina",
+      "Wolfkeil, Dion"
+    ],
+    "isbn": "694-475-564-5",
+    "pages": 270,
+    "publisher": "Prentice-Hall",
+    "title": "Basics of Go Programming",
+    "year": 2017
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.602Z",
+    "authors": [
+      "Espinosa, Abagail",
+      "Wilson, Ivan"
+    ],
+    "isbn": "368-919-475-8",
+    "pages": 493,
+    "publisher": "Manning",
+    "title": "Fundamentals of Go Programming",
+    "year": 2013
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.860Z",
+    "authors": [
+      "Wysocki, Joyce",
+      "Avitia, Brook",
+      "Richters, Emmett",
+      "Wohlford, Mona"
+    ],
+    "isbn": "704-678-659-8",
+    "pages": 328,
+    "publisher": "New Starch",
+    "title": "Go Prats and Pitfalls",
+    "year": 2009
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.636Z",
+    "authors": [
+      "Craft, Fabian",
+      "Arevalo, Emmalee",
+      "Wingenbach, Iris"
+    ],
+    "isbn": "654-887-371-6",
+    "pages": 93,
+    "publisher": "Addison-Wesley",
+    "title": "Go Programmers Reference",
+    "year": 2017
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.870Z",
+    "authors": [
+      "Woolridge, Yamilex",
+      "Auburg, Jocelyn"
+    ],
+    "isbn": "553-318-122-1",
+    "pages": 189,
+    "publisher": "O'Reilly",
+    "title": "Go Reference Manual",
+    "year": 2017
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.605Z",
+    "authors": [
+      "Villegas, Kai",
+      "Kitchens, Yessenia",
+      "Fozzard, Karlie"
+    ],
+    "isbn": "052-220-915-5",
+    "pages": 99,
+    "publisher": "Pearson",
+    "title": "Go: The Definitive Guide",
+    "year": 2007
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.541Z",
+    "authors": [
+      "Dail, Kaytlin",
+      "Westbay, Jevin",
+      "Rushing, Jermaine"
+    ],
+    "isbn": "867-297-534-0",
+    "pages": 523,
+    "publisher": "Pearson",
+    "title": "Go: The Good Parts",
+    "year": 2008
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.785Z",
+    "authors": [
+      "Craft, Kaili",
+      "Widen, Caitlan"
+    ],
+    "isbn": "349-377-401-2",
+    "pages": 221,
+    "publisher": "Manning",
+    "title": "Intermediate Go Programming",
+    "year": 2008
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.543Z",
+    "authors": [
+      "Futrell, Gunnar",
+      "Calder, Sade"
+    ],
+    "isbn": "153-874-482-8",
+    "pages": 434,
+    "publisher": "New Starch",
+    "title": "Programming in Go",
+    "year": 2002
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.372Z",
+    "authors": [
+      "Ackley, Angel",
+      "Wielinski, Zenia",
+      "Batten, Marycather",
+      "Ransome, Annalie"
+    ],
+    "isbn": "732-339-628-9",
+    "pages": 371,
+    "publisher": "Prentice-Hall",
+    "title": "The Idiot's Guide to Go",
+    "year": 2019
+  }
+]
+
+# look within previous results
+$ ./index.mjs mongodb://localhost:27017/books find-books \
+     authorsTitleSearch=Go _index=2 _count=2
+[
+  {
+    "_lastModified": "2020-06-29T01:43:15.602Z",
+    "authors": [
+      "Espinosa, Abagail",
+      "Wilson, Ivan"
+    ],
+    "isbn": "368-919-475-8",
+    "pages": 493,
+    "publisher": "Manning",
+    "title": "Fundamentals of Go Programming",
+    "year": 2013
+  },
+  {
+    "_lastModified": "2020-06-29T01:43:15.860Z",
+    "authors": [
+      "Wysocki, Joyce",
+      "Avitia, Brook",
+      "Richters, Emmett",
+      "Wohlford, Mona"
+    ],
+    "isbn": "704-678-659-8",
+    "pages": 328,
+    "publisher": "New Starch",
+    "title": "Go Prats and Pitfalls",
+    "year": 2009
+  }
+]f
+
+#create a new cart: 0
+$ ./index.mjs mongodb://localhost:27017/books new-cart
+"0.41899391628263505"
+
+#create another new cart: 1
+$ ./index.mjs mongodb://localhost:27017/books new-cart
+"1.5099511580410097"
+
+#add Go book to cart 1
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=1.5099511580410097 sku=704-678-659-8 nUnits=2
+
+#bad cart id
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=1.5099511580410097x sku=368-919-475-8 nUnits=1
+cartId:BAD_ID: no updates for cart "1.5099511580410097x"
+
+#add another Go book to cart 1
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=1.5099511580410097 sku=368-919-475-8 nUnits=1
+
+#display cart 1
+$ ./index.mjs mongodb://localhost:27017/books get-cart \
+     cartId=1.5099511580410097
+{
+  _lastModified: 2020-06-29T02:03:07.046Z,
+  '704-678-659-8': 2,
+  '368-919-475-8': 1
+}
+
+#cart 0 is still empty
+$ ./index.mjs mongodb://localhost:27017/books get-cart \
+     cartId=0.41899391628263505
+{ _lastModified: 2020-06-29T02:01:12.436Z }
+
+
+#add Go book to cart 0
+$ ./index.mjs mongodb://localhost:27017/books cart-item \
+     cartId=0.41899391628263505 sku=368-919-475-8 nUnits=5
+
+#display cart 0
+$ ./index.mjs mongodb://localhost:27017/books get-cart \
+     cartId=0.41899391628263505
+{ _lastModified: 2020-06-29T02:05:04.815Z, '368-919-475-8': 5 }
+
+#display cart 1
+$ ./index.mjs mongodb://localhost:27017/books get-cart cartId=1.5099511580410097
+{
+  _lastModified: 2020-06-29T02:03:07.046Z,
+  '704-678-659-8': 2,
+  '368-919-475-8': 1
+}
+
+$ 

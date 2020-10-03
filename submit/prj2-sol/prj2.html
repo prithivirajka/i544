@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 544: Project 2</title>
+    <link href="prj2/hl-fine_blue.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../../index.html" class="material-icons">house</a></li>
+	<li><a href="../../docs/index.html">Docs</a></li>
+	<li><a href="../../exercises/index.html">Exercises</a></li>
+	<li><a href="../../hws/index.html">Homeworks</a></li>
+	<li><a href="../../misc/index.html">Misc</a></li>
+	<li><a href="../../projects/index.html">Projects</a></li>
+	<li><a href="../../slides/index.html">Slides</a></li>
+	<li><a id="loginAction"></a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj2.umt:1:0"><h1 data-coord="prj2.umt:1:0">Project 2</h1><p data-coord="prj2.umt:3:0"><strong data-coord="prj2.umt:3:0">Due</strong>: July 11 by 11:59p
+</p><p data-coord="prj2.umt:5:0"><strong data-coord="prj2.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj2.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj2.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in your letter grade
+for the entire course being reduced by one level.
+</p><p data-coord="prj2.umt:9:0">This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  This is followed by a log
+which should help you understand the requirements.  Finally, it
+provides some hints as to how those requirements can be met.
+</p><section data-coord="prj2.umt:14:0"><h2 data-coord="prj2.umt:14:0">Aims</h2><p data-coord="prj2.umt:17:0">The aims of this project are as follows:
+</p><ul data-coord="prj2.umt:19:0"><li data-coord="prj2.umt:19:0"><p data-coord="prj2.umt:19:4">To give you more experience with JavaScript programming.
+</p></li><li data-coord="prj2.umt:21:0"><p data-coord="prj2.umt:21:4">To expose you to mongodb.
+</p></li><li data-coord="prj2.umt:23:0"><p data-coord="prj2.umt:23:4">To make you comfortable using nodejs packages and module system.
+</p></li></ul></section><section data-coord="prj2.umt:26:0"><h2 data-coord="prj2.umt:26:0">Overview</h2><p data-coord="prj2.umt:29:0">In this project, you will implement two kinds of persistent objects:
+</p><p data-coord="prj2.umt:31:2"><strong data-coord="prj2.umt:31:2">A book catalog</strong> containing a collection of books.  Each
+book is identified by an ISBN and has additional fields
+like title, one-or-more authors, publisher, year published,
+and number of pages.  For simplicity, the catalog does not
+track quantities or allow deletion of items from the catalog.
+</p><p data-coord="prj2.umt:37:2"><strong data-coord="prj2.umt:37:2">A shopping cart</strong> containing zero-or-more catalog items.  It maps a
+catalog identifier (referred to in industry parlance as a <em data-coord="prj2.umt:37:130">Stock
+  Keeping Unit</em> or <samp data-coord="prj2.umt:37:156">sku</samp>) to the quantity of that catalog item in the
+cart.  The cart in this project will only contain books.  For
+simplicity, the shopping cart does not have any prices.
+</p></section><section data-coord="prj2.umt:43:0"><h2 data-coord="prj2.umt:43:0">Requirements</h2><p data-coord="prj2.umt:47:0">You must push a <samp data-coord="prj2.umt:47:16">submit/prj2-sol</samp> directory to your github
+repository such that typing <samp data-coord="prj2.umt:47:87">npm ci</samp> within that directory is
+sufficient to run the project using <samp data-coord="prj2.umt:47:157">./index.mjs</samp>.  
+</p><p data-coord="prj2.umt:51:0">You are being provided with an <samp data-coord="prj2.umt:51:31">index.mjs</samp> which provides the required
+command-line behavior.  What you specifically need to do is add code
+to the provided <a href="./prj2-sol/model.mjs?colorize=true" data-coord="prj2.umt:51:194">model.mjs</a> source file as per the requirements in that file.
+</p><p data-coord="prj2.umt:56:0">The behavior of the program is illustrated in this
+<em data-coord="prj2.umt:56:65"><a href="extras/LOG" data-coord="prj2.umt:56:65">annotated log</a></em>.
+</p></section><section data-coord="prj2.umt:62:0"><h2 data-coord="prj2.umt:62:0">Provided Files</h2><p data-coord="prj2.umt:65:0">The <a href="./prj2-sol" data-coord="prj2.umt:65:18">prj2-sol</a> directory contains a start for your
+project.  It contains the following files:
+</p><dl data-coord="prj2.umt:68:0"><dt data-coord="prj2.umt:68:4"> <a href="./prj2-sol/model.mjs?colorize=true" data-coord="prj2.umt:68:39">model.mjs</a></dt><dd data-coord="prj2.umt:69:0"><p data-coord="prj2.umt:69:6">This skeleton file constitutes the guts of your project.  You
+will need to flesh out the skeleton, adding code as per the
+documentation.  You should feel free to add any auxiliary
+function, method definitions or even auxiliary files as
+required.
+</p><p data-coord="prj2.umt:75:6">The provided code does most (<strong data-coord="prj2.umt:75:39">not all</strong>) the validations
+necessary for this project.
+</p></dd><dt data-coord="prj2.umt:78:4"> <a href="./prj2-sol/index.mjs?colorize=true" data-coord="prj2.umt:78:39">index.mjs</a></dt><dd data-coord="prj2.umt:79:0"><p data-coord="prj2.umt:79:6">This file provides the complete command-line behavior which is
+required by your program.  It requires
+<a href="./prj2-sol/model.mjs?colorize=true" data-coord="prj2.umt:79:158">model.mjs.</a>  You <strong data-coord="prj2.umt:79:174">must
+      not</strong> modify this file; this ensures that your <samp data-coord="prj2.umt:79:232">Model</samp> class
+meets its specifications and facilitates automated testing by
+testing only the <samp data-coord="prj2.umt:79:337">Model</samp> API.
+</p></dd><dt data-coord="prj2.umt:86:4"> <a href="./prj2-sol/meta.mjs?colorize=true" data-coord="prj2.umt:86:38">meta.mjs</a></dt><dd data-coord="prj2.umt:87:0"><p data-coord="prj2.umt:87:6">Meta-information about the different model object categories.
+You should try to avoid modifying this file.
+</p></dd><dt data-coord="prj2.umt:90:4"> <a href="./prj2-sol/model-error.mjs?colorize=true" data-coord="prj2.umt:90:45">model-error.mjs</a></dt><dd data-coord="prj2.umt:91:0"><p data-coord="prj2.umt:91:6">A trival class for application errors.
+</p></dd><dt data-coord="prj2.umt:93:4"> <a href="./prj2-sol/validator.mjs?colorize=true" data-coord="prj2.umt:93:43">validator.mjs</a></dt><dd data-coord="prj2.umt:94:0"><p data-coord="prj2.umt:94:6">Validation code for checking for local errors which depend only
+on a single object instance.  Note that it provides generic
+validation based on types for input parameters.  More validation
+will be necessary, for checking for global errors across
+objects.
+</p></dd><dt data-coord="prj2.umt:100:4"> <a href="./prj2-sol/README" data-coord="prj2.umt:100:22">README</a></dt><dd data-coord="prj2.umt:101:0"><p data-coord="prj2.umt:101:6">A README file which must be submitted along with your project.
+It contains an initial header which you must complete (replace
+the dummy entries with your name, B-number and email address at
+which you would like to receive project-related email).  After
+the header you may include any content which you would like read
+during the grading of your project.
+</p></dd></dl><p data-coord="prj2.umt:108:0">Additionally, the <em data-coord="prj2.umt:108:32"><a href="../../data" data-coord="prj2.umt:108:32">course data directory</a></em>
+contains data files which can be used to test your project.
+</p></section><section data-coord="prj2.umt:111:0"><h2 data-coord="prj2.umt:111:0">MongoDB</h2><p data-coord="prj2.umt:114:0"><a href="https://docs.mongodb.com/manual/" data-coord="prj2.umt:114:36">MongoDB</a> is a popular nosql
+database.  It allows storage of <em data-coord="prj2.umt:114:95">collections</em> of <em data-coord="prj2.umt:114:112">documents</em> to be
+accessed by a primary key named <samp data-coord="prj2.umt:114:162">_id</samp>.  
+</p><p data-coord="prj2.umt:118:0">In terms of JavaScript, mongodb documents correspond to arbitrarily
+nested JavaScript <samp data-coord="prj2.umt:118:86">Object</samp>s having a top-level <samp data-coord="prj2.umt:118:115">_id</samp> property which is
+used as a primary key. If an object does not have an <samp data-coord="prj2.umt:118:192">_id</samp> property,
+then one will be created with a unique value assigned by mongodb.
+</p><ul data-coord="prj2.umt:123:0"><li data-coord="prj2.umt:123:0"><p data-coord="prj2.umt:123:4">MongoDB provides a basic repertoire of
+<em data-coord="prj2.umt:123:88"><a href="https://docs.mongodb.com/manual/crud/" data-coord="prj2.umt:123:88">CRUD Operations</a></em>.
+</p></li><li data-coord="prj2.umt:127:0"><p data-coord="prj2.umt:127:4">All asynchronous mongo library functions can be called directly using
+<samp data-coord="prj2.umt:127:78">await</samp>.
+</p></li><li data-coord="prj2.umt:130:0"><p data-coord="prj2.umt:130:4">It is important to ensure that all database connections are closed.
+Otherwise your program will not exit gracefully.
+</p></li></ul><p data-coord="prj2.umt:133:0">You can play with mongo by starting up a
+<em data-coord="prj2.umt:133:83"><a href="https://docs.mongodb.com/manual/mongo/" data-coord="prj2.umt:133:83">mongo shell</a></em>:
+</p><pre data-coord="prj2.umt:137:0">$ mongo
+MongoDB shell version v3.6.8
+connecting to: mongodb://127.0.0.1:27017
+...
+Server has startup warnings:
+...
+&gt; help
+	db.help()                    help on db methods
+	...
+	exit                         quit the mongo shell
+&gt; 
+</pre><p data-coord="prj2.umt:151:0">Since mongodb is available for different languages, make sure that you
+are looking at the
+<em data-coord="prj2.umt:151:167"><a href="http://mongodb.github.io/node-mongodb-native/3.6/quick-start/quick-start/" data-coord="prj2.umt:151:167">nodejs documentation</a></em>.
+</p><ul data-coord="prj2.umt:156:0"><li data-coord="prj2.umt:156:0"><p data-coord="prj2.umt:156:4">You can get a connection to a mongodb server using the mongo
+client's asynchronous
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html#.connect" data-coord="prj2.umt:156:181">connect()</a> method.
+</p></li><li data-coord="prj2.umt:161:0"><p data-coord="prj2.umt:161:4">Once you have a connection to a server, you can get to a specific
+database using the synchronous <a href="http://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html#db" data-coord="prj2.umt:161:181">db()</a> method.
+</p></li><li data-coord="prj2.umt:164:0"><p data-coord="prj2.umt:164:4">From a database, you can get to a specific collection using the
+synchronous
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Db.html#collection" data-coord="prj2.umt:164:167">collection()</a> method.
+</p></li><li data-coord="prj2.umt:169:0"><p data-coord="prj2.umt:169:4">Given a collection, you can asynchronously insert into it using
+the
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#insertOne" data-coord="prj2.umt:169:166">insert*()</a> methods.  
+</p></li><li data-coord="prj2.umt:174:0"><p data-coord="prj2.umt:174:4">Given a collection, you can asynchronously
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#find" data-coord="prj2.umt:174:132">find()</a> a cursor which meets the criteria specified by a filter to
+<samp data-coord="prj2.umt:174:202">find()</samp>.  The query can be used to filter the collection;
+specifically, if the filter specifies an <samp data-coord="prj2.umt:174:306">_id</samp>, then the cursor
+returned by the <samp data-coord="prj2.umt:174:349">find()</samp> should contain at most one result.
+</p><p data-coord="prj2.umt:181:4">If the value of the filter field is an object containing
+properties for one of mongodb's
+<em data-coord="prj2.umt:181:166"><a href="https://docs.mongodb.com/manual/reference/operator/query/" data-coord="prj2.umt:181:166">query selectors</a></em>, then the filter can do more than merely match
+the find parameters.
+</p></li><li data-coord="prj2.umt:193:0"><p data-coord="prj2.umt:193:4">Given a cursor, you can modify it using the synchronous
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#sort" data-coord="prj2.umt:193:141">sort(),</a>
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#skip" data-coord="prj2.umt:193:230">skip()</a> and
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#limit" data-coord="prj2.umt:193:323">limit()</a> methods.
+</p></li><li data-coord="prj2.umt:201:0"><p data-coord="prj2.umt:201:4">Given a cursor, you can get all its results as an array using the
+asynchronous <a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#toArray" data-coord="prj2.umt:201:163">toArray()</a> method.
+</p></li><li data-coord="prj2.umt:204:0"><p data-coord="prj2.umt:204:4">Mongo db <a href="https://docs.mongodb.com/manual/indexes/" data-coord="prj2.umt:204:57">indexes</a> can
+be used to facilitate search.  In particular, it supports a
+<strong data-coord="prj2.umt:204:137">single</strong> <em data-coord="prj2.umt:204:194"><a href="https://docs.mongodb.com/manual/text-search/" data-coord="prj2.umt:204:194">text index</a></em>
+on each collection.
+</p></li></ul></section><section data-coord="prj2.umt:210:0"><h2 data-coord="prj2.umt:210:0">Hints</h2><p data-coord="prj2.umt:214:0">The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+</p><ol data-coord="prj2.umt:217:0"><li data-coord="prj2.umt:217:0"><p data-coord="prj2.umt:217:4">Read the project requirements thoroughly.  Look at the
+sample log to make sure you understand the necessary behavior.
+Review the material covered in class including the
+<a href="../../slides/users-store/code/users-store" data-coord="prj2.umt:217:230">users-store</a>
+example.
+</p></li><li data-coord="prj2.umt:224:0"><p data-coord="prj2.umt:224:4">Look into debugging methods for your project.  Possibilities
+include:
+</p><ul data-coord="prj2.umt:227:0"><li data-coord="prj2.umt:227:0"><p data-coord="prj2.umt:227:8">Logging debugging information onto the terminal using
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/log" data-coord="prj2.umt:227:135">console.log()</a> or
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/error" data-coord="prj2.umt:227:220">console.error().</a>
+</p></li><li data-coord="prj2.umt:233:0"><p data-coord="prj2.umt:233:8">Use the chrome debugger as outlined in this
+<a href="https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27" data-coord="prj2.umt:233:164">article.</a>  Specifically, use the <samp data-coord="prj2.umt:233:196">--inspect-brk</samp> node option
+when starting your program and then visit <samp data-coord="prj2.umt:233:267">about://inspect</samp>
+in your chrome browser.
+</p><p data-coord="prj2.umt:239:1">There seems to be some problems getting all necessary files
+loaded in to the chrome debugger.  This may be due to the use
+of ES6 modules.  If you do not see all your source files when
+the debugger starts up, repeatedly use the <em data-coord="prj2.umt:239:231">return from
+	current function</em> control repeatedly until the necessary
+source files are available in the debugger at which point you
+can insert necessary breakpoints (the critical file will
+probably be <samp data-coord="prj2.umt:239:436">model.mjs</samp> where you will be doing
+most of your debugging).
+</p><p data-coord="prj2.umt:249:1">The provided <samp data-coord="prj2.umt:249:14">model.mjs</samp> file has a commented out <samp data-coord="prj2.umt:249:51">debugger</samp>
+line.  If the above procedure does not work, then uncomment
+that line and try again.
+</p><p data-coord="prj2.umt:253:8">The couple of minutes spent looking at this link and setting
+up chrome as your debugger for this project will be more than
+repaid in the time saved adding and removing <samp data-coord="prj2.umt:253:178">console.log()</samp>
+statements to your code.
+</p></li></ul><p data-coord="prj2.umt:258:4">A common cause for development errors is missing a use of <samp data-coord="prj2.umt:258:62">await</samp>
+before an asynchronous call.  Whenever you get an error message
+about some method not supported by an object, that object may
+unexpectedly be a <samp data-coord="prj2.umt:258:226">Promise</samp> because you did not use <samp data-coord="prj2.umt:258:260">await</samp>.
+</p></li><li data-coord="prj2.umt:263:0"><p data-coord="prj2.umt:263:4">Consider how you can use mongo to implement this project and use
+its indexing facilities to access your model data easily.
+</p><p data-coord="prj2.umt:266:4">Try to use mongo's facilities as much as possible; for example,
+use mongo's <samp data-coord="prj2.umt:266:84">_id</samp> field to hold object ID's; instead of writing
+code for filtering, design your database objects such that you can
+use the filtering capabilities of mongo's
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#find" data-coord="prj2.umt:266:338">find()</a> method; use the cursor modification methods like
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#sort" data-coord="prj2.umt:266:475">sort(),</a>
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#skip" data-coord="prj2.umt:266:564">skip()</a> and
+<a href="http://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#limit" data-coord="prj2.umt:266:657">limit()</a> to sort your results and implement paging within results.
+</p><p data-coord="prj2.umt:279:4">Since opening a connection to a database is an expensive
+operation, it is common to open up a connection at the start of a
+program and hang on to it for the duration of the program.  It is
+also important to remember to close the connection before
+termination of the program.
+</p><p data-coord="prj2.umt:285:4">[Note that except for the <samp data-coord="prj2.umt:285:30">load</samp> command, the provided
+command-line program for this project performs only a single
+command for each program run.  This is not typical and will not be
+the case in future projects. Hence the API provided for <samp data-coord="prj2.umt:285:255">Model</samp>
+allows for multiple operations for each instance and you should
+associate the database connection with the instance of <samp data-coord="prj2.umt:285:390">Model</samp>.]
+</p></li><li data-coord="prj2.umt:293:0"><p data-coord="prj2.umt:293:4">Start your project by creating a <samp data-coord="prj2.umt:293:37">submit/prj2-sol</samp> directory in a
+new <samp data-coord="prj2.umt:293:78">prj2-sol</samp> branch of your <samp data-coord="prj2.umt:293:104">i444</samp> or <samp data-coord="prj2.umt:293:114">i544</samp> directory
+corresponding to your github repository. Change into the newly
+created <samp data-coord="prj2.umt:293:210">prj2-sol</samp> directory and initialize your project by
+running <samp data-coord="prj2.umt:293:274">npm init -y</samp>.
+</p><pre>    $ <span class="hl kwb">cd</span> ~<span class="hl opt">/</span>i?<span class="hl num">44</span>
+    $ git checkout <span class="hl kwb">-b</span> prj2-sol <span class="hl slc">#create new branch</span>
+    $ <span class="hl kwc">cp</span> <span class="hl kwb">-pr</span> ~<span class="hl opt">/</span>cs544<span class="hl opt">/</span>projects<span class="hl opt">/</span>prj<span class="hl num">1</span><span class="hl opt">/</span>prj2-sol . <span class="hl slc">#copy provided files</span>
+    $ <span class="hl kwb">cd</span> prj2-sol              <span class="hl slc">#go into project dir</span>
+    $ npm init <span class="hl kwb">-y</span>              <span class="hl slc">#initialize project</span></pre><p data-coord="prj2.umt:308:4">This will create a <samp data-coord="prj2.umt:308:23">package.json</samp> file; this file will be
+committed to your repository in the next step.
+</p></li><li data-coord="prj2.umt:311:0"><p data-coord="prj2.umt:311:4">Commit into git:
+</p><pre>    $ git add .                    <span class="hl slc">#add directory to git staging area</span>
+    $ git commit <span class="hl kwb">-m</span> <span class="hl str">&apos;started prj2&apos;</span> <span class="hl slc">#commit locally</span>
+    $ git push <span class="hl kwb">-u</span> origin prj2-sol  <span class="hl slc">#push branch with changes</span>
+                                   <span class="hl slc">#to github</span></pre></li><li data-coord="prj2.umt:322:0"><p data-coord="prj2.umt:322:4">Install the mongodb client library using <samp data-coord="prj2.umt:322:45">npm install mongodb</samp>.
+It will install the library and its dependencies into a
+<samp data-coord="prj2.umt:322:132">node_modules</samp> directory created within your current directory.
+It will also create a <samp data-coord="prj2.umt:322:222">package-lock.json</samp> which must be committed
+into your git repository.
+</p><p data-coord="prj2.umt:328:4">The created <samp data-coord="prj2.umt:328:16">node_modules</samp> directory should <strong data-coord="prj2.umt:328:48">not</strong> be committed to
+git.  This should be enforced not only by the <samp data-coord="prj2.umt:328:120">.gitignore</samp> file
+you copied over when starting the project, but also by the
+<samp data-coord="prj2.umt:328:205">.gitignore</samp> file at the root of your repository which was set up
+when you followed the provided
+<a href="../../misc/git-setup/git-setup.html" data-coord="prj2.umt:328:349">directions</a> for setting up
+github.  If you have not already done so, please add a line
+containing simply <samp data-coord="prj2.umt:328:461">node_modules</samp> to a <samp data-coord="prj2.umt:328:481">.gitignore</samp> file at the
+top-level of your <samp data-coord="prj2.umt:328:528">i444</samp> or <samp data-coord="prj2.umt:328:538">i544</samp> github project.
+</p></li><li data-coord="prj2.umt:339:0"><p data-coord="prj2.umt:339:4">Commit your changes:
+</p><pre>    $ git add package-lock.json
+    $ git commit <span class="hl kwb">-a -m</span> <span class="hl str">&apos;added package-lock&apos;</span>
+    $ git push</pre></li><li data-coord="prj2.umt:348:0"><p data-coord="prj2.umt:348:4">You should be able to run the project but all commands will return
+without any results until you replace the @TODO sections with
+suitable code.
+</p><p data-coord="prj2.umt:352:4">The provided code does have sufficient functionality to get a
+usage message:
+</p><pre data-coord="prj2.umt:356:0">    ./index.mjs
+    usage: index.mjs MONGO_DB_URL COMMAND
+      where COMMAND is one of 
+      add-book    NAME=VALUE...
+          create or update a book
+    ...	  
+    new-cart    NAME=VALUE...
+        create a new shopping cart, returning cart id
+</pre><p data-coord="prj2.umt:366:4">or even do some simple validations:
+</p><pre data-coord="prj2.umt:369:0">    $ ./index.mjs GARBAGE_URL clear
+    ***  bad mongo url GARBAGE_URL
+    usage: index.mjs MONGO_DB_URL COMMAND
+    ...
+    $ ./index.mjs mongodb://localhost:27017 add-book \
+         isbn=x123 title='some bad book' \
+	 authors='[author, bad; other author, evil]' 
+    isbn:BAD_FIELD_VALUE: bad value: "x123":
+       The ISBN field must consists of one-or-more digits separated by '-'.
+    :MISSING_FIELD: missing fields "Publisher", "Publication Year".
+    $
+</pre></li><li data-coord="prj2.umt:382:0"><p data-coord="prj2.umt:382:4">Replace the <samp data-coord="prj2.umt:382:16">XXX</samp> entries in the <samp data-coord="prj2.umt:382:37">README</samp> template.
+</p></li><li data-coord="prj2.umt:385:0"><p data-coord="prj2.umt:385:4">Commit your project to github:
+</p><pre data-coord="prj2.umt:388:0">    $ git add .
+    $ git commit -a -m 'set up prj2 files'
+    $ git push
+</pre></li><li data-coord="prj2.umt:393:0"><p data-coord="prj2.umt:393:4">Open the copy of the <samp data-coord="prj2.umt:393:25">model.mjs</samp> file in your project directory.
+Start by implementing the factory method  <samp data-coord="prj2.umt:393:115">make()</samp>.  It is set
+up to call the <samp data-coord="prj2.umt:393:155">Model</samp> constructor with a <samp data-coord="prj2.umt:393:182">props</samp> object which
+contains properties to be injected into the new <samp data-coord="prj2.umt:393:255">Model</samp> being
+constructed.  As provided, only a single <samp data-coord="prj2.umt:393:314">validator</samp> property
+is set up; you will need to set up additional properties.
+</p><ul data-coord="prj2.umt:400:0"><li data-coord="prj2.umt:400:0"><p data-coord="prj2.umt:400:10"><a href="http://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html#.connect" data-coord="prj2.umt:400:102">Connect</a> to the database to get a client instance.
+</p></li><li data-coord="prj2.umt:403:0"><p data-coord="prj2.umt:403:10">Create properties for any collections your design uses.
+</p></li></ul><p data-coord="prj2.umt:405:4">The final synchronous call of the <samp data-coord="prj2.umt:405:38">constructor()</samp> will cache
+all the properties you set up in the newly created <samp data-coord="prj2.umt:405:120">Model</samp> instance.
+</p><p data-coord="prj2.umt:408:4">[An instance of a <samp data-coord="prj2.umt:408:22">Model</samp> should contain a database connection,
+ but obtaining a database connection is an asynchronous operation.
+ Since it is impossible to have an
+ <em data-coord="prj2.umt:408:266"><a href="https://stackoverflow.com/questions/43431550/async-await-class-constructor" data-coord="prj2.umt:408:266">asynchronous constructor</a></em>, an <samp data-coord="prj2.umt:408:297">async</samp> factory method provides a
+ workaround.  Setting up indexes is also asynchronous; this too
+ can be done in the <samp data-coord="prj2.umt:408:423">async</samp> factory method].
+</p></li><li data-coord="prj2.umt:416:0"><p data-coord="prj2.umt:416:4">Think of a <samp data-coord="prj2.umt:416:15">try-catch</samp> template for implementing all your action
+methods.  This should be set up to catch any errors and convert
+them to <samp data-coord="prj2.umt:416:149">ModelError</samp>'s having code <samp data-coord="prj2.umt:416:176">DB</samp>.
+</p></li><li data-coord="prj2.umt:420:0"><p data-coord="prj2.umt:420:4">Implement the <samp data-coord="prj2.umt:420:18">close()</samp> method using a property you have cached
+within the <samp data-coord="prj2.umt:420:83">Model</samp> instance.
+</p></li><li data-coord="prj2.umt:423:0"><p data-coord="prj2.umt:423:4">Implement the <samp data-coord="prj2.umt:423:18">clear()</samp> method. Since databases and collections
+come into life automatically in mongodb, you can implement
+clear by clearing out all of your collections. 
+</p></li><li data-coord="prj2.umt:427:0"><p data-coord="prj2.umt:427:4">Implement the <samp data-coord="prj2.umt:427:18">new_cart()</samp> method.  All you really need to
+do is create an ID for the cart being created and store
+it in the database using something like
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#insertOne" data-coord="prj2.umt:427:254">insertOne().</a> (do not forget to <samp data-coord="prj2.umt:427:285">await</samp> the asynchronous call).
+</p><p data-coord="prj2.umt:432:4">The generated ID for the new cart should be a <samp data-coord="prj2.umt:432:50">String</samp> satisfying
+the following:
+</p><ul data-coord="prj2.umt:435:0"><li data-coord="prj2.umt:435:0"><p data-coord="prj2.umt:435:8">It must be unique.
+</p></li><li data-coord="prj2.umt:437:0"><p data-coord="prj2.umt:437:8">To avoid security problems it should not be easily guessable.
+</p></li><li data-coord="prj2.umt:439:0"><p data-coord="prj2.umt:439:8">It should not be generated directly by the database as that
+can make data migration clumsy.
+</p></li></ul><p data-coord="prj2.umt:442:4">Uniqueness can be ensured by making an ID contain some kind of
+sequential counter; to avoid having to explicitly persist the
+counter, it could be mainained implicitly as the number of entries
+within some mongo collection.
+</p><p data-coord="prj2.umt:447:4">Non-guessability can be ensured by including a random portion generated
+using <samp data-coord="prj2.umt:447:86">Math.random()</samp>.
+</p><p data-coord="prj2.umt:450:4">Test using the mongo shell to ensure that you are creating carts with
+the IDs you expect.
+</p></li><li data-coord="prj2.umt:453:0"><p data-coord="prj2.umt:453:4">Implement the <samp data-coord="prj2.umt:453:18">cartItem()</samp> method.  You can use mongo's
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#updateOne" data-coord="prj2.umt:453:151">updateOne()</a> methods using mongo's
+<a href="https://docs.mongodb.com/manual/reference/operator/update/set/" data-coord="prj2.umt:453:259">$set</a> and
+<a href="https://docs.mongodb.com/manual/reference/operator/update/currentDate/" data-coord="prj2.umt:453:350">$currentDate</a> operators.  You can report a <samp data-coord="prj2.umt:453:392">BAD_ID</samp> error if the
+<samp data-coord="prj2.umt:453:418">matchedCount</samp> of the update result is different from <samp data-coord="prj2.umt:453:472">1</samp>.
+</p><p data-coord="prj2.umt:462:4">If <samp data-coord="prj2.umt:462:7">nUnits</samp> is 0, you can remove the SKU from the cart.
+Alternatively, you can simply store the 0 within the cart and
+filter out the corresponding SKU when returning the cart.
+</p><p data-coord="prj2.umt:466:4">[For now, ignore the requirement for a <samp data-coord="prj2.umt:466:43">BAD_ID</samp> error when the
+<samp data-coord="prj2.umt:466:71">sku</samp> specifies an unknown ISBN, since you have not yet
+implemented the book catalog.]
+</p></li><li data-coord="prj2.umt:470:0"><p data-coord="prj2.umt:470:4">Implement the <samp data-coord="prj2.umt:470:18">getCart()</samp> method.  You can use mongo's
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#findOne" data-coord="prj2.umt:470:148">findOne()</a> method.  If there is no cart for the specified <samp data-coord="prj2.umt:470:205">cartId</samp>,
+it will return <samp data-coord="prj2.umt:470:234">null</samp> which you can check to report a <samp data-coord="prj2.umt:470:273">BAD_ID</samp>
+error.
+</p><p data-coord="prj2.umt:476:4">If you are storing SKU's having 0 <samp data-coord="prj2.umt:476:38">nUnits</samp>, then filter out those
+SKU's before returning the retrieved cart.
+</p></li><li data-coord="prj2.umt:479:0"><p data-coord="prj2.umt:479:4">Implement the <samp data-coord="prj2.umt:479:18">addBook()</samp> method. The <samp data-coord="prj2.umt:479:42">upsert</samp> option for mongo's
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#updateOne" data-coord="prj2.umt:479:161">updateOne()</a> is useful to implement the required semantics of
+insert or update.
+</p><p data-coord="prj2.umt:484:4">You can test by inserting a single book or by using the <samp data-coord="prj2.umt:484:60">loadBooks</samp>
+command to load multiple books from a file.
+</p></li><li data-coord="prj2.umt:487:0"><p data-coord="prj2.umt:487:4">Implement the <samp data-coord="prj2.umt:487:18">findBooks()</samp> method.  First set up the prerequisite
+indexing, probably within the <samp data-coord="prj2.umt:487:105">make()</samp> factory method.  Once you
+have done so, mongo's
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#find" data-coord="prj2.umt:487:252">find()</a> method provides the necessary functionality.  Pull out any
+<samp data-coord="prj2.umt:487:322">_index</samp> and <samp data-coord="prj2.umt:487:335">_count</samp> parameters from the <samp data-coord="prj2.umt:487:364">nameValues</samp>, using
+default values if they are not present.  Set up a
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#sort" data-coord="prj2.umt:487:520">sort(),</a>
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#skip" data-coord="prj2.umt:487:610">skip()</a> and
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html#limit" data-coord="prj2.umt:487:704">limit()</a> filter on the
+<a href="https://mongodb.github.io/node-mongodb-native/3.6/api/Cursor.html" data-coord="prj2.umt:487:803">Cursor</a> returned by the <samp data-coord="prj2.umt:487:826">find()</samp>.
+</p></li><li data-coord="prj2.umt:503:0"><p data-coord="prj2.umt:503:4">Go back to <samp data-coord="prj2.umt:503:15">cartItem()</samp> code and add a check to see whether the
+<samp data-coord="prj2.umt:503:72">sku</samp> provided is valid using your newly implemented <samp data-coord="prj2.umt:503:125">findBooks()</samp>
+method to do a search by ISBN.
+</p></li><li data-coord="prj2.umt:508:0"><p data-coord="prj2.umt:508:4">Iterate until you meet all requirements.  
+</p></li></ol><p data-coord="prj2.umt:510:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When complete, please
+follow the procedure given in the
+<em data-coord="prj2.umt:510:214"><a href="../../misc/git-setup/git-setup.html#prj-submit" data-coord="prj2.umt:510:214">git setup</a></em> document
+to merge your <samp data-coord="prj2.umt:510:249">prj1-sol</samp> branch into your <samp data-coord="prj2.umt:510:277">master</samp> branch and submit
+your project to the grader via github.
+</p></section></section>
+    </div> <!-- #content -->
+    <script src="../../assets/scripts/loginAction.js"></script>
+  </body>
+</html>
