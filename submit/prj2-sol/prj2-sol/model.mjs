@@ -67,19 +67,22 @@ export default class Model {
    *  by dbUrl
    */ 
   static async make(dbUrl) {
-    let client;
+    let client, dataBaseName;
     try {
       //@TODO
       client = await mongo.connect(dbUrl, MONGO_CONNECT_OPTIONS);
-      dataBase = client.db(dataBaseName);
+      const db = client.db(dataBaseName);
+      const bookCollection = db.collection(BOOKS);
+      const index = { title: 'text', authors: 'text'}; 
+      await bookCollection.createIndex(index);
+      const cartCollection = db.collection(CARTS);
 
       const props = {
 	    validator: new Validator(META),
       //@TODO other properties
-      client, dataBase, dataBaseName,
+      client: client, db: db, bookCollection, cartCollection,
       };
       const model = new Model(props);
-      await model.createIndex({ title: 'text', authors: 'text', });
       return model;
     }
     catch (err) {
@@ -100,7 +103,8 @@ export default class Model {
   async clear() {
     //@TODO
     try {
-      await this.dataBase.dropDatabase();
+      await this.bookCollection.dropDatabase();
+      await this.cartCollection.dropDatabase();
     }
     catch (err) {
       throw [ new ModelError('DB', err.message || err.toString()) ];
@@ -118,12 +122,17 @@ export default class Model {
   async newCart(rawNameValues) {
     const nameValues = this._validate('newCart', rawNameValues);
     //@TODO
-    const id = (Math.random()).toString();
-    const cart = {_id: id, _lastModified: new Date()};
-    const cartCollection = this.db.collection(CART);
-    const ret = await cartCollection.insertOne(cart);
-    if (ret.insertedCount <= 0) throw [new ModelError('DB', err.message)];
-    return id;
+    try {
+      const id = (Math.random()).toString();
+      const cart = {_id: id, _lastModified: new Date()};
+      //const cartCollection = db.collection(CARTS);
+      const ret = await this.cartCollection.insertOne(cart);
+      if (ret.insertedCount <= 0) throw [new ModelError('DB', err.message)];
+      return id;
+    }
+    catch(err) {
+      throw [ new ModelError('DB', err.message || err.toString()) ];
+    }
   }
 
   /** Given fields { cartId, sku, nUnits } = rawNameValues, update
@@ -134,27 +143,30 @@ export default class Model {
    *    BAD_ID: cartId does not reference a cart.
    *            sku does not specify the isbn of an existing book.
    */
-  async cartItem(rawNameValues) {
+
+   async cartItem(rawNameValues) {
     const nameValues = this._validate('cartItem', rawNameValues);
-    //@TODO
-    try {
-      const nameValues = { Id: id, nUnits, sku} ;
-      const ret = await this.db.collection(BOOK).find({isbn: nameValues.sku}).toArray();
-      if(ret.length === 0) {
-        throw [new ModelError('BAD_ID', `unknown sku ${sku}`, 'sku') ];
-      }
-      const cart = { $currentDate : { _lastModified: true } };
-      const cartCollection = this.db.collection(CART);
-      const res = await cartCollection.updateOne( { id}, cart);
-      if(res.matchedCount !== 1) {
-        throw [new ModelError('BAD_ID', `no updates for cart ${Id}`, `cartId`)];
-      }
+
+    const get_book_data = await this.db.collection("book_data").find({"isbn":nameValues.sku}).toArray()
+    if(get_book_data.length === 0){
+      throw [new ModelError("BAD_ID","unknow sku "+nameValues.sku,"sku")]
     }
-    throw (e) {
-      throw [ new ModelError('DB', err.message || err.toString()) ];
+    let set_parameters = {};
+    set_parameters[nameValues.sku] = nameValues.nUnits;
+    let update;
+    let cart_item;
+    if( nameValues.nUnits === 0){
+      cart_item = {$currentDate:{_lastModified:true},$unset:{[nameValues.sku]:1}} 
+    }else{
+      cart_item = {$currentDate:{_lastModified:true},  $set:set_parameters}
+    }
+    const response = await this.db.collection("cart").updateOne({"_id":nameValues.cartId},cart_item)
+    if(response.modifiedCount === 0){
+      throw [new ModelError("BAD_ID","no updates for cart "+nameValues.cartId,"cartId")]
     }
   }
-  
+   
+   
   /** Given fields { cartId } = nameValues, return cart identified by
    *  cartId.  The cart is returned as an object which contains a
    *  mapping from SKU's to *positive* integers (representing the
@@ -170,10 +182,10 @@ export default class Model {
     const nameValues = this._validate('getCart', rawNameValues);
     //@TODO
     try {
-      const nameValues = { Id: id, } ;
-      const ret = await this.db.collection(CART).findOne({id});
+      const ret = await this.cartCollection.findOne({_id: nameValues.cartId}, { projection: { _id: 0 } });
+
       if (ret === null) {
-        throw [new ModelError('BAD_ID', `not able to find cart ${Id}`, 'Id')]
+        throw [new ModelError('BAD_ID', `not able to find cart ${nameValues.cartId}`, 'cartId')]
       }
       return ret;
     }
@@ -196,6 +208,17 @@ export default class Model {
   async addBook(rawNameValues) {
     const nameValues = this._validate('addBook', rawNameValues);
     //@TODO
+    //const bookCollection = await this.db.collection(BOOK_COLLECTION).find({isbn: nameValues.isbn}).toArray();
+    try {
+      //line for id
+      const bookDetail = Object.assign({}, nameValues, { _id, _lastModified: new Date()});
+      const booksCollection = this.db.collection(BOOK);
+      const res = await booksCollection.updateOne( nameValues, { $set: bookDetails }, { upsert: true });
+      return _id;
+    }
+    catch (err) {
+      throw [ new ModelError('DB', err.message || err.toString()) ];
+    }
   }
 
   /** Given fields { isbn, authorsTitle, _count=COUNT, _index=0 } =
@@ -210,9 +233,27 @@ export default class Model {
    *  Will return [] if no books match the search criteria.
    */
   async findBooks(rawNameValues) {
+
     const nameValues = this._validate('findBooks', rawNameValues);
     //@TODO
-    return [];
+    const searchData = {}
+    if(rawNameValues.hasOwnProperty("isbn")){
+      searchData["isbn"] = rawNameValues.isbn
+	  
+    }else{
+      const find_data = { $search : nameValues.authorsTitleSearch}
+      searchData.$text = find_data
+    }
+
+    await this.db.collection(BOOKS).createIndex({title:"text",authors:"text"})
+    const data =  await this.db.collection(BOOKS).find(searchData)
+        .limit(nameValues._count||COUNT)
+        .sort({"title":1})
+        .skip(nameValues._index|| 0)
+        .project({_id:0})
+        .toArray()
+
+    return data;
   }
 
   //wrapper around this.validator to verify that no external field
@@ -249,5 +290,5 @@ const COUNT = 5;
 
 //define private constants and functions here.
 
-const BOOKS = 'bookCollection';
-const CARTS = 'cartCollection';
+const BOOKS = 'books';
+const CARTS = 'carts';
