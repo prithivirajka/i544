@@ -1,0 +1,504 @@
+  		      P r o j e c t   3
+
+*Due*: July 23 by 11:59p
+
+*Important Reminder*: As per the course .<../../misc/academic-honesty-statement/academic-honesty-policy.html> "Academic Honesty Statement",
+cheating of any kind will minimally result in your letter grade
+for the entire course being reduced by one level.
+
+This document first describes the aims of this project followed by a
+brief overview.  It then lists the requirements as explicitly as
+possible.  This is followed by a log which should help you understand
+the requirements.  It describes the files with which you have been
+provided.  Finally, it provides some hints as to how the project
+requirements can be met.
+
+
+
+			Aims
+			====
+
+The aims of this project are as follows:
+
+  + To expose you to expressjs.
+    
+  + To make you design and implement REST web services.
+
+  + To implement .<https://en.wikipedia.org/wiki/HATEOAS> HATEOAS.
+
+
+       	    		Overview
+			========
+
+In this project, you will use the persistent model from your
+.<../prj2/prj2.html> "Project 2" to implement JSON web services to:
+
+  + Search a read-only book catalog.  
+
+  + Create, update and display shopping carts.
+
+Each one of these will be modelled as a *collection* of *collection
+items*.
+
+Each collection will be available behind a RESTful *collection URL*.
+A collection URL `COLL_URL` can typically be set up as follows:
+
+  + A `POST` to `COLL_URL` creates a new item in the collection with a
+    201 `CREATED` empty response.  The `Location` header in the
+    response should specify the *item-URL* of the newly created item
+    which is typically along the lines of `COLL_URL/ID`, where `ID` is
+    an ID for the newly created item.
+
+    Note that this is not supported for the books collection since the
+    books catalog is read-only.
+
+  + A `GET` to `COLL_URL` enhanced with query-parameters will search
+    for all items in the collection which satisfy the query parameters.
+    The response will usually contain next/previous links to facilitate
+    scrolling through the results.
+
+    Note that the carts collection does not support search.
+
+  + A `GET` to an "item-URL" will return the details of that collection
+    item.
+
+  + A `PATCH` to an "item-URL" will update that collection item with
+    parameters specified in the request body with a 204 No Content
+    HTTP status.
+
+    Note that this is not supported for books since they are
+    read-only.
+
+Note that a request to an invalid item URL should result in a
+404 Not Found HTTP response as usual.
+
+			Requirements
+			============
+
+
+You must push a `submit/prj3-sol` directory to your github
+repository such that typing `npm ci` within that directory 
+followed by `./index.mjs` with usage:
+
+```
+./index.mjs PORT MONGO_DB_URaL [DATA_FILE...]
+```
+
+will start a web server listening on `PORT` backed up by the database
+specified by `MONGO_DB_URL`.
+
+The `DATA_FILE` arguments should specify `*.json` or `*.json.gz` files
+containing book data.  If there is at least one `DATA_FILE` argument,
+then the database is cleared of *all* data (both
+books and carts).
+
+You are being provided with code which provides the necessary
+command-line behavior.
+
+The responses of the web services you build can be of two types:
+
+  + An *error response*: The response must be a JSON object with two
+    properties:
+
+      : `status` :
+        This must be an integer and must match the HTTP status
+	for the response.
+
+      : `errors` :
+        This must be a list of errors, where each error must
+	be a JSON object containing the following properties:
+
+          : `code` :
+	    A string giving a code for the error.
+
+          : `message` :
+	    The error message which should be as detailed as possible.
+
+          : `name` :
+	    The internal name of the widget which is the proximate
+	    cause of the error (optional).
+
+    Note that this must be the format for *all* error responses.
+
+  + A *success response*: All non-empty success response must be a
+    JSON object, possibly containing the following two properties:
+
+      : `result` :
+        The main result of the web service.  Documented for
+	each web services.
+
+      : `links` :
+        This must be a list of links for the response, where each
+	link must be a JSON object containing the following properties:
+
+          : `href` :
+	     An absolute URL for the linked resource.
+
+          : `rel` :
+	    The relationship between the response and the
+	    linked resource.
+
+          : `name` :
+	    A description for the link.
+
+         This top-level `links` property must always contain a
+	 "self-link" with `rel` and `name` both set to `self` and
+	 `href` set to the URL which generated the response.
+	
+What you specifically need to do is add code to the provided
+.<./prj3-sol/src/ws-server.mjs?colorize=true> ws-server.mjs source
+file to implement the following URLs served on
+`http://localhost:PORT`:
+
+  : `GET` `/api` :
+    There is no `result` property, but the `links` property
+    must contain the following 3 links:
+
+      + A "self-link" as documented above.
+
+      + A "books-link" with `rel` set to `collection` and `name` set
+        to `books` and `href` set to a collection URL for books. The
+        value for `href` is entirely up to you as long as it is
+        subordinate to `/api`; the sequel refers to this `href` value
+        as the "books-collection-url".
+
+      + A "carts-link" with `rel` set to `collection` and `name` set
+        to `cart` and `href` set to a collection URL for carts.  The
+        value for `href` is entirely up to you as long as it is
+        subordinate to `/api`; the sequel refers to this `href` value
+        as the "carts-collection-URL".
+
+  : `GET` "books-collection-URL" :
+    Conduct a search for books which match specified query parameters
+    `isbn`, `authorsTitleSearch`, `_index` and `_count`.  Return
+    `result` as a list of matching results sorted by book `title`.
+    The `result` list can contain up to `_count` results (default 5),
+    starting at `_index` (default 0).  The `result` list should be
+    empty if there are no matching results.
+
+    Each individual book item in the `result` list should be enhanced
+    with a `links` property containing a single link with `rel` set to
+    `details`, `name` set to `book` and `href` set to the
+    "book-item-URL" for that book item.
+
+    The overall response should also have a top-level `links` property
+    containing up to 3 links:
+
+      + A "self-link" as described above.  This must always be
+        present and must point to the URL resulting in this response.
+
+      + A "next-link" with `rel` and `name` both set to `next` and
+        `href` set to a URL which can be used to get the next
+	set of `_count` results.  This link should be present only
+	if there are subsequent results for the search.
+    
+      + A "previous-link" with `rel` and `name` both set to `prev` and
+        `href` set to a URL which can be used to get the previous
+	set of `_count` results.  This link should be present only
+	if there are previous results for the search.
+
+    The last two links can be used for scrolling through search results.
+
+  : `GET` "book-item-URL" :
+    The `result` property is set to the book identified by
+    "book-item-URL".  The `links` property should be a list containing
+    a single "self" link.  The response should fail with a 404 error
+    if there is no such book.
+
+  : `POST` "carts-collection-URL" :
+    This should create a new shopping cart.  The response should be
+    empty with status 204 `CREATED` with a `Location` header set to
+    the URL of the newly created cart.  In the sequel, the URL for an
+    individual cart is referred to as the "cart-URL".
+
+  : `GET` "cart-URL" :
+    Display the contents of the specified cart.  A successful
+    response should have the following properties:
+
+      : '_lastModified' :
+        A timestamp giving the time the cart was last modified.
+
+      : `links` :
+        A list containing a single "self-link".
+
+      : `result` :
+        A list of the cart items.  Each item should have `sku` and
+	`nUnits` properties as well as a `links` property specifying a
+	single link with `rel` set to `item`, `name` set to `book` and
+	`href` set to the "book-item-URL" for the book item
+	corresponding to the `sku`.
+
+  : `PATCH` "cart-URL" :
+    This request must have a JSON body giving the `sku` and `nUnits`
+    to be updated.  The cart specified by "cart-URL" is updated with
+    the specified `sku` and `nUnits` with a return HTTP status of 204
+    `No Content`.  If the `sku` does not correspond to the ISBN of a
+    book in the catalog, then the HTTP response should be a `404 Not
+    Found`.
+
+The behavior of the program is illustrated in this .<extras/LOG.sh>
+"annotated log".
+
+A working version of these web services can be accessed at the
+.<http://zdu.binghamton.edu:2345/api> "".  Note that this URL
+is accessible only from within the CS network; you should be able
+to access it from your VM.
+
+
+	     	 	 Provided Files
+			 ==============
+
+The .<./prj3-sol> prj3-sol directory contains a start for your
+project.  It contains the following files:
+
+    : .<./prj3-sol/src/ws-server.mjs?colorize=true> ws-server.mjs:
+      A skeleton file for your project.  You should be doing
+      all your development in this file.
+
+    : .<./prj3-sol/index.mjs?colorize=true> index.mjs:
+      The file invoked on the command-line.  It is a trivial
+      wrapper which simply calls `cli.mjs`.
+
+    : .<./prj3-sol/src/cli.mjs?colorize=true> cli.mjs:
+      This file provides the complete command-line behavior which is
+      required by your program.  It requires
+      .<./prj3-sol/src/model.mjs?colorize=true> model.mjs.  You *must
+      not* modify this file; this ensures that your server meets
+      its command-line specifications.
+
+    : .<./prj3-sol/src/model.mjs?colorize=true> model.mjs:
+      Identical to the skeleton file provided for your previous
+      project.  This file has been provided only to ensure
+      that the code in the `prj3-sol` directory can be run
+      out-of-the-box.  In practice, you will replace the
+      file with either that from your solution to Project 2,
+      or the class solution for Project 2.
+
+    : .<./prj3-sol/src/meta.mjs?colorize=true> meta.mjs:
+      Meta-information about the different model object categories.
+      Identical to that provided for your previous project.
+
+    : .<./prj3-sol/src/model-error.mjs?colorize=true> model-error.mjs:
+      A trival class for application errors.
+      Identical to that provided for your previous project.
+
+    : .<./prj3-sol/src/validator.mjs?colorize=true> validator.mjs:
+      Validation code for checking for local errors which depend only
+      on a single object instance.  Note that it provides generic
+      validation based on types for input parameters.  The model will
+      need to perform additional validation for checking for global
+      errors across objects.  Identical to that provided for your
+      previous project.
+
+     
+    : .<./prj3-sol/README> README:
+      A README file which must be submitted along with your project.
+      It contains an initial header which you must complete (replace
+      the dummy entries with your name, B-number and email address at
+      which you would like to receive project-related email).  After
+      the header you may include any content which you would like read
+      during the grading of your project.
+
+The .<../../data> "course data directory" contains data files which
+can be used to test your project.  It remains unchanged from your
+previous project.
+
+			Hints
+			=====
+
+The following points are worth noting:
+
+  + The provided code should pretty much take care of *most* error
+    handling.
+
+  + When running your server in the background use bash's `fg` command
+    to put it in the foreground.  Once it is in the foreground, you
+    can kill it using control-C.
+
+  + Remember that specifying the `DATA_FILE...` arguments when starting
+    your server results in all data (including carts) being cleared
+    and all books being reloaded from `DATA_FILE...`.  So this is
+    not something you want to do when you are working on carts.
+
+  + The JSON produced by the web services is not formatted. If the web
+    services are run on the command line using a program like curl,
+    the output can be piped through a program like
+    .<http://manpages.ubuntu.com/manpages/trusty/man1/json_pp.1.html>
+    json_pp (pre-installed on your VM).  If running directly within
+    Chrome (not using some kind of REST client), use a Chrome
+    extension like
+    .<https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en>
+    "JSON Formatter".
+
+  + To make development easy, it is useful to not have to manually
+    restart the server after each source code change.  Automated
+    restarts can be achieved by using a program like
+    .<https://www.npmjs.com/package/nodemon> nodemon.  Once `nodemon`
+    is installed within your `node_modules` directory, you can start
+    your server from the `prj3-sol` directory using something like:
+
+    ```
+    $ npx nodemon --watch src \
+        ./index.mjs 2345 mongodb://localhost:27017/books
+    ```
+
+    and the server will be automatically restarted whenever you make
+    changes to JavaScript files in `src`.
+
+    The above command assumes that the books have already been loaded
+    into the database.  It is usually a bad idea to provide the
+    `DATA_FILE` argument, as doing so will result in your database
+    being cleared out on every automated restart; this can be rather
+    disconcerting if you are attempt to debug shopping carts!
+
+The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+
+  # Read the project requirements thoroughly.  Look at the
+    .<extras/LOG.sh> "sample log" to make sure you understand the
+    necessary behavior.  Review the material covered in class
+    including the .<../../slides/users-ws/code/users-ws> users-ws
+    example.
+
+  # The requirements only specify a single URL `/api`.  Decide
+    on the "books-collection-URL" and the "carts-collection-URL".
+
+  # Decide on how you will send HTTP requests to your server.  You can
+    do so using a command-line HTTP client like
+    .<https://curl.haxx.se/> curl as in the provided .<extras/LOG.sh>
+    log, or a brower client like
+    .<https://chrome.google.com/webstore/detail/talend-api-tester-free-ed/aejoelaoggembcahagimdiliamlcdmfm?hl=en>
+    "Talend API Tester" or .<https://yet-another-rest-client.com/>
+    yarc.
+
+  # Set up your `prj3-sol` branch and `submit/prj3-sol` as per
+    your previous projects.
+
+  # Install necessary modules.  You will need `mongo`, `express`
+    and `body-parser` as runtime dependencies and `nodemon`
+    as a development dependency.
+  
+
+  # You should be able to run the project with a usage message
+    and the `/api` base URL returning a partial result:
+
+
+    ```
+    $ ./index.mjs 
+    966164
+    usage: index.mjs PORT MONGO_DB_URL [DATA_FILE...]
+    $ ./index.mjs 2345 mongodb://localhost:27017/books &
+    [2] 966196
+    $ 966196
+    listening on port 2345
+
+    $ curl -s http://localhost:2345/api | json_pp
+    {
+       "links" : [
+          {
+            "href" : "http://localhost:2345/api",
+            "name" : "self",
+            "rel" : "self"
+          }
+       ]
+    }
+    ```
+
+  # Replace the `XXX` entries in the `README` template and commit your
+    project to github.
+
+  # Replace the skeleton `model.mjs` file in your `src` directory with
+    one from a solution to Project 2.  You can use one from your
+    solution or that from the .<../prj2-sol/model.mjs> "provided
+    solution".  Note that a model instance generated by the
+    `model.mjs` from the provided solution exports a `DEFAULT_COUNT`
+    property; this is a somewhat clumsy attempt to avoid violating DRY
+    by providing access to the default value for the number of search
+    results.
+
+  # Complete the provided `doBase()` handler to add in links for
+    the book and cart collections based on the URLs you have chosen.
+
+  # Point a `POST` route to a handler for creating a new shopping
+    cart.  
+
+    The handler will need to be `async` since it will need to get the
+    cart ID by making an asynchronous `newCart()` call to the model
+    accessed as `app.locals.model`.  The returned cart ID can be used
+    to build up a URL for the newly created cart.  Add a `Location`
+    header giving the cart's URL using
+    .<https://expressjs.com/en/4x/api.html#res.append> res.append().
+    Finally, set the response
+    .<https://expressjs.com/en/4x/api.html#res.status> status as per
+    the requirements and
+    .<https://expressjs.com/en/4x/api.html#res.end> end an empty
+    response.
+
+    The code for the handler (and all subsequent handlers) should be
+    enclosed within a `try-catch` similar to the `try-catch` provided
+    for `doBase()`.  Note that you could wrap each handler within an
+    `errorWrap()` function as done in the
+    .<../../slides/users-ws/code/users-ws> users-ws example, but that
+    is not necessary as long as you keep the `catch` block code simple
+    enough to avoid exceptions.
+
+    When testing, you can use mongo shell to verify that you have
+    created a new cart in the database.
+
+  # Set up a `PATCH` handler for updating a cart.  Since different
+    carts will have different cart IDs, use express's path patterns to
+    allow arbitrary cart IDs.  Extract the cart ID from the request
+    URL using .<https://expressjs.com/en/4x/api.html#req.params>
+    req.params.  Since the
+    .<https://www.npmjs.com/package/body-parser> body-parser has been
+    set up as a JSON parser for all request bodies, you should find an
+    object corresponding to the request parameters like `sku` and
+    `nUnits` in `req.body`.  Combine these parameters with the cart ID
+    extracted from the request path to make a call to the model's
+    `cartItem()` method.  
+
+    Verify your tests using mongo shell.
+
+  # Set up a `GET` handler for an individual book.  You can call the
+    model's `findBooks()` with an `isbn` search parameter containing the
+    book's isbn extracted from the request path.  If `findBooks()` does
+    not return exactly one book, throw a suitable error.  Build up the
+    required response object containing a suitable `links`
+    property. Finally deliver the built-up response using
+    .<https://expressjs.com/en/4x/api.html#res.json> res.json().
+
+  # Set up a route and handler to display the contents of a cart.
+    Retrieve the cart contents by calling `getCart()` on the model.
+    Massage the contents into the required format, adding `links`
+    properties.
+
+  # Set up a `GET` handler for searching for books by query parameters
+    accessed via .<https://expressjs.com/en/4x/api.html#req.query>
+    req.query.  Extract `_count` and `_index` from the query parameters,
+    defaulting them to the specified default values if they are
+    not present.  These enhanced query parameters can be used as
+    parameters to the model's `findBooks()` method except for one
+    embellishment which facilitates the "next-link".
+
+    Recall that the requirements specify that a "next-link" should be
+    present only if there are further results.  Hence set things up so
+    that the count provided to `findBooks()` is one greater than the
+    requested count.  Then if `findBooks()` returns this larger count
+    of results, then the "next-link" must be generated, otherwise it
+    should not be generated.
+
+    Set up a response object to contain the returned books with each
+    books enhanced with a `links` property for the individual book.
+    Set up a top-level `links` property for the response object.  It
+    will always contain a self-link.  It should contain a
+    "previous-link" only if the requested `_index` was greater than 0.
+    It will contain a "next-link" as described above.
+
+  # Iterate until you meet all requirements.  
+
+It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When complete, please
+follow the procedure given in the
+.<../../misc/git-setup/git-setup.html#prj-submit> "git setup" document
+to merge your `prj1-sol` branch into your `master` branch and submit
+your project to the grader via github.

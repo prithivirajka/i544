@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 544: Project 3</title>
+    
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../../index.html" class="material-icons">house</a></li>
+	<li><a href="../../docs/index.html">Docs</a></li>
+	<li><a href="../../exercises/index.html">Exercises</a></li>
+	<li><a href="../../hws/index.html">Homeworks</a></li>
+	<li><a href="../../misc/index.html">Misc</a></li>
+	<li><a href="../../projects/index.html">Projects</a></li>
+	<li><a href="../../slides/index.html">Slides</a></li>
+	<li><a id="loginAction"></a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj3.umt:1:0"><h1 data-coord="prj3.umt:1:0">Project 3</h1><p data-coord="prj3.umt:3:0"><strong data-coord="prj3.umt:3:0">Due</strong>: July 23 by 11:59p
+</p><p data-coord="prj3.umt:5:0"><strong data-coord="prj3.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj3.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj3.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in your letter grade
+for the entire course being reduced by one level.
+</p><p data-coord="prj3.umt:9:0">This document first describes the aims of this project followed by a
+brief overview.  It then lists the requirements as explicitly as
+possible.  This is followed by a log which should help you understand
+the requirements.  It describes the files with which you have been
+provided.  Finally, it provides some hints as to how the project
+requirements can be met.
+</p><section data-coord="prj3.umt:18:0"><h2 data-coord="prj3.umt:18:0">Aims</h2><p data-coord="prj3.umt:21:0">The aims of this project are as follows:
+</p><ul data-coord="prj3.umt:23:0"><li data-coord="prj3.umt:23:0"><p data-coord="prj3.umt:23:4">To expose you to expressjs.
+</p></li><li data-coord="prj3.umt:25:0"><p data-coord="prj3.umt:25:4">To make you design and implement REST web services.
+</p></li><li data-coord="prj3.umt:27:0"><p data-coord="prj3.umt:27:4">To implement <a href="https://en.wikipedia.org/wiki/HATEOAS" data-coord="prj3.umt:27:58">HATEOAS.</a>
+</p></li></ul></section><section data-coord="prj3.umt:30:0"><h2 data-coord="prj3.umt:30:0">Overview</h2><p data-coord="prj3.umt:33:0">In this project, you will use the persistent model from your
+<em data-coord="prj3.umt:33:82"><a href="../prj2/prj2.html" data-coord="prj3.umt:33:82">Project 2</a></em> to implement JSON web services to:
+</p><ul data-coord="prj3.umt:36:0"><li data-coord="prj3.umt:36:0"><p data-coord="prj3.umt:36:4">Search a read-only book catalog.  
+</p></li><li data-coord="prj3.umt:38:0"><p data-coord="prj3.umt:38:4">Create, update and display shopping carts.
+</p></li></ul><p data-coord="prj3.umt:40:0">Each one of these will be modelled as a <strong data-coord="prj3.umt:40:40">collection</strong> of <strong data-coord="prj3.umt:40:56">collection
+items</strong>.
+</p><p data-coord="prj3.umt:43:0">Each collection will be available behind a RESTful <strong data-coord="prj3.umt:43:51">collection URL</strong>.
+A collection URL <samp data-coord="prj3.umt:43:86">COLL_URL</samp> can typically be set up as follows:
+</p><ul data-coord="prj3.umt:46:0"><li data-coord="prj3.umt:46:0"><p data-coord="prj3.umt:46:4">A <samp data-coord="prj3.umt:46:6">POST</samp> to <samp data-coord="prj3.umt:46:16">COLL_URL</samp> creates a new item in the collection with a
+201 <samp data-coord="prj3.umt:46:79">CREATED</samp> empty response.  The <samp data-coord="prj3.umt:46:110">Location</samp> header in the
+response should specify the <strong data-coord="prj3.umt:46:167">item-URL</strong> of the newly created item
+which is typically along the lines of <samp data-coord="prj3.umt:46:246">COLL_URL/ID</samp>, where <samp data-coord="prj3.umt:46:267">ID</samp> is
+an ID for the newly created item.
+</p><p data-coord="prj3.umt:52:4">Note that this is not supported for the books collection since the
+books catalog is read-only.
+</p></li><li data-coord="prj3.umt:55:0"><p data-coord="prj3.umt:55:4">A <samp data-coord="prj3.umt:55:6">GET</samp> to <samp data-coord="prj3.umt:55:15">COLL_URL</samp> enhanced with query-parameters will search
+for all items in the collection which satisfy the query parameters.
+The response will usually contain next/previous links to facilitate
+scrolling through the results.
+</p><p data-coord="prj3.umt:60:4">Note that the carts collection does not support search.
+</p></li><li data-coord="prj3.umt:62:0"><p data-coord="prj3.umt:62:4">A <samp data-coord="prj3.umt:62:6">GET</samp> to an <em data-coord="prj3.umt:62:18">item-URL</em> will return the details of that collection
+item.
+</p></li><li data-coord="prj3.umt:65:0"><p data-coord="prj3.umt:65:4">A <samp data-coord="prj3.umt:65:6">PATCH</samp> to an <em data-coord="prj3.umt:65:20">item-URL</em> will update that collection item with
+parameters specified in the request body with a 204 No Content
+HTTP status.
+</p><p data-coord="prj3.umt:69:4">Note that this is not supported for books since they are
+read-only.
+</p></li></ul><p data-coord="prj3.umt:72:0">Note that a request to an invalid item URL should result in a
+404 Not Found HTTP response as usual.
+</p></section><section data-coord="prj3.umt:75:0"><h2 data-coord="prj3.umt:75:0">Requirements</h2><p data-coord="prj3.umt:79:0">You must push a <samp data-coord="prj3.umt:79:16">submit/prj3-sol</samp> directory to your github
+repository such that typing <samp data-coord="prj3.umt:79:87">npm ci</samp> within that directory 
+followed by <samp data-coord="prj3.umt:79:131">./index.mjs</samp> with usage:
+</p><pre data-coord="prj3.umt:84:0">./index.mjs PORT MONGO_DB_URaL [DATA_FILE...]
+</pre><p data-coord="prj3.umt:87:0">will start a web server listening on <samp data-coord="prj3.umt:87:37">PORT</samp> backed up by the database
+specified by <samp data-coord="prj3.umt:87:83">MONGO_DB_URL</samp>.
+</p><p data-coord="prj3.umt:90:0">The <samp data-coord="prj3.umt:90:4">DATA_FILE</samp> arguments should specify <samp data-coord="prj3.umt:90:41">*.json</samp> or <samp data-coord="prj3.umt:90:53">*.json.gz</samp> files
+containing book data.  If there is at least one <samp data-coord="prj3.umt:90:119">DATA_FILE</samp> argument,
+then the database is cleared of <strong data-coord="prj3.umt:90:173">all</strong> data (both
+books and carts).
+</p><p data-coord="prj3.umt:95:0">You are being provided with code which provides the necessary
+command-line behavior.
+</p><p data-coord="prj3.umt:98:0">The responses of the web services you build can be of two types:
+</p><ul data-coord="prj3.umt:100:0"><li data-coord="prj3.umt:100:0"><p data-coord="prj3.umt:100:4">An <strong data-coord="prj3.umt:100:7">error response</strong>: The response must be a JSON object with two
+properties:
+</p><dl data-coord="prj3.umt:103:0"><dt data-coord="prj3.umt:103:6"> <samp data-coord="prj3.umt:103:1">status</samp> </dt><dd data-coord="prj3.umt:104:0"><p data-coord="prj3.umt:104:8">This must be an integer and must match the HTTP status
+for the response.
+</p></dd><dt data-coord="prj3.umt:107:6"> <samp data-coord="prj3.umt:107:1">errors</samp> </dt><dd data-coord="prj3.umt:108:0"><p data-coord="prj3.umt:108:8">This must be a list of errors, where each error must
+be a JSON object containing the following properties:
+</p><dl data-coord="prj3.umt:111:0"><dt data-coord="prj3.umt:111:10"> <samp data-coord="prj3.umt:111:1">code</samp> </dt><dd data-coord="prj3.umt:112:0"><p data-coord="prj3.umt:112:5">A string giving a code for the error.
+</p></dd><dt data-coord="prj3.umt:114:10"> <samp data-coord="prj3.umt:114:1">message</samp> </dt><dd data-coord="prj3.umt:115:0"><p data-coord="prj3.umt:115:5">The error message which should be as detailed as possible.
+</p></dd><dt data-coord="prj3.umt:117:10"> <samp data-coord="prj3.umt:117:1">name</samp> </dt><dd data-coord="prj3.umt:118:0"><p data-coord="prj3.umt:118:5">The internal name of the widget which is the proximate
+cause of the error (optional).
+</p></dd></dl></dd></dl><p data-coord="prj3.umt:121:4">Note that this must be the format for <strong data-coord="prj3.umt:121:42">all</strong> error responses.
+</p></li><li data-coord="prj3.umt:123:0"><p data-coord="prj3.umt:123:4">A <strong data-coord="prj3.umt:123:6">success response</strong>: All non-empty success response must be a
+JSON object, possibly containing the following two properties:
+</p><dl data-coord="prj3.umt:126:0"><dt data-coord="prj3.umt:126:6"> <samp data-coord="prj3.umt:126:1">result</samp> </dt><dd data-coord="prj3.umt:127:0"><p data-coord="prj3.umt:127:8">The main result of the web service.  Documented for
+each web services.
+</p></dd><dt data-coord="prj3.umt:130:6"> <samp data-coord="prj3.umt:130:1">links</samp> </dt><dd data-coord="prj3.umt:131:0"><p data-coord="prj3.umt:131:8">This must be a list of links for the response, where each
+link must be a JSON object containing the following properties:
+</p><dl data-coord="prj3.umt:134:0"><dt data-coord="prj3.umt:134:10"> <samp data-coord="prj3.umt:134:1">href</samp> </dt><dd data-coord="prj3.umt:135:0"><p data-coord="prj3.umt:135:6">An absolute URL for the linked resource.
+</p></dd><dt data-coord="prj3.umt:137:10"> <samp data-coord="prj3.umt:137:1">rel</samp> </dt><dd data-coord="prj3.umt:138:0"><p data-coord="prj3.umt:138:5">The relationship between the response and the
+linked resource.
+</p></dd><dt data-coord="prj3.umt:141:10"> <samp data-coord="prj3.umt:141:1">name</samp> </dt><dd data-coord="prj3.umt:142:0"><p data-coord="prj3.umt:142:5">A description for the link.
+</p></dd></dl><p data-coord="prj3.umt:144:9">This top-level <samp data-coord="prj3.umt:144:24">links</samp> property must always contain a
+<em data-coord="prj3.umt:144:65">self-link</em> with <samp data-coord="prj3.umt:144:82">rel</samp> and <samp data-coord="prj3.umt:144:92">name</samp> both set to <samp data-coord="prj3.umt:144:111">self</samp> and
+<samp data-coord="prj3.umt:144:124">href</samp> set to the URL which generated the response.
+</p></dd></dl></li></ul><p data-coord="prj3.umt:148:0">What you specifically need to do is add code to the provided
+<a href="./prj3-sol/src/ws-server.mjs?colorize=true" data-coord="prj3.umt:148:107">ws-server.mjs</a> source
+file to implement the following URLs served on
+<samp data-coord="prj3.umt:148:175">http://localhost:PORT</samp>:
+</p><dl data-coord="prj3.umt:153:0"><dt data-coord="prj3.umt:153:2"> <samp data-coord="prj3.umt:153:1">GET</samp> <samp data-coord="prj3.umt:153:7">/api</samp> </dt><dd data-coord="prj3.umt:154:0"><p data-coord="prj3.umt:154:4">There is no <samp data-coord="prj3.umt:154:16">result</samp> property, but the <samp data-coord="prj3.umt:154:43">links</samp> property
+must contain the following 3 links:
+</p><ul data-coord="prj3.umt:157:0"><li data-coord="prj3.umt:157:0"><p data-coord="prj3.umt:157:8">A <em data-coord="prj3.umt:157:10">self-link</em> as documented above.
+</p></li><li data-coord="prj3.umt:159:0"><p data-coord="prj3.umt:159:8">A <em data-coord="prj3.umt:159:10">books-link</em> with <samp data-coord="prj3.umt:159:28">rel</samp> set to <samp data-coord="prj3.umt:159:41">collection</samp> and <samp data-coord="prj3.umt:159:58">name</samp> set
+to <samp data-coord="prj3.umt:159:80">books</samp> and <samp data-coord="prj3.umt:159:92">href</samp> set to a collection URL for books. The
+value for <samp data-coord="prj3.umt:159:156">href</samp> is entirely up to you as long as it is
+subordinate to <samp data-coord="prj3.umt:159:225">/api</samp>; the sequel refers to this <samp data-coord="prj3.umt:159:259">href</samp> value
+as the <em data-coord="prj3.umt:159:287">books-collection-url</em>.
+</p></li><li data-coord="prj3.umt:165:0"><p data-coord="prj3.umt:165:8">A <em data-coord="prj3.umt:165:10">carts-link</em> with <samp data-coord="prj3.umt:165:28">rel</samp> set to <samp data-coord="prj3.umt:165:41">collection</samp> and <samp data-coord="prj3.umt:165:58">name</samp> set
+to <samp data-coord="prj3.umt:165:80">cart</samp> and <samp data-coord="prj3.umt:165:91">href</samp> set to a collection URL for carts.  The
+value for <samp data-coord="prj3.umt:165:156">href</samp> is entirely up to you as long as it is
+subordinate to <samp data-coord="prj3.umt:165:225">/api</samp>; the sequel refers to this <samp data-coord="prj3.umt:165:259">href</samp> value
+as the <em data-coord="prj3.umt:165:287">carts-collection-URL</em>.
+</p></li></ul></dd><dt data-coord="prj3.umt:171:2"> <samp data-coord="prj3.umt:171:1">GET</samp> <em data-coord="prj3.umt:171:7">books-collection-URL</em> </dt><dd data-coord="prj3.umt:172:0"><p data-coord="prj3.umt:172:4">Conduct a search for books which match specified query parameters
+<samp data-coord="prj3.umt:172:74">isbn</samp>, <samp data-coord="prj3.umt:172:82">authorsTitleSearch</samp>, <samp data-coord="prj3.umt:172:104">_index</samp> and <samp data-coord="prj3.umt:172:117">_count</samp>.  Return
+<samp data-coord="prj3.umt:172:139">result</samp> as a list of matching results sorted by book <samp data-coord="prj3.umt:172:193">title</samp>.
+The <samp data-coord="prj3.umt:172:210">result</samp> list can contain up to <samp data-coord="prj3.umt:172:242">_count</samp> results (default 5),
+starting at <samp data-coord="prj3.umt:172:288">_index</samp> (default 0).  The <samp data-coord="prj3.umt:172:315">result</samp> list should be
+empty if there are no matching results.
+</p><p data-coord="prj3.umt:179:4">Each individual book item in the <samp data-coord="prj3.umt:179:37">result</samp> list should be enhanced
+with a <samp data-coord="prj3.umt:179:81">links</samp> property containing a single link with <samp data-coord="prj3.umt:179:128">rel</samp> set to
+<samp data-coord="prj3.umt:179:145">details</samp>, <samp data-coord="prj3.umt:179:156">name</samp> set to <samp data-coord="prj3.umt:179:170">book</samp> and <samp data-coord="prj3.umt:179:181">href</samp> set to the
+<em data-coord="prj3.umt:179:203">book-item-URL</em> for that book item.
+</p><p data-coord="prj3.umt:184:4">The overall response should also have a top-level <samp data-coord="prj3.umt:184:54">links</samp> property
+containing up to 3 links:
+</p><ul data-coord="prj3.umt:187:0"><li data-coord="prj3.umt:187:0"><p data-coord="prj3.umt:187:8">A <em data-coord="prj3.umt:187:10">self-link</em> as described above.  This must always be
+present and must point to the URL resulting in this response.
+</p></li><li data-coord="prj3.umt:190:0"><p data-coord="prj3.umt:190:8">A <em data-coord="prj3.umt:190:10">next-link</em> with <samp data-coord="prj3.umt:190:27">rel</samp> and <samp data-coord="prj3.umt:190:37">name</samp> both set to <samp data-coord="prj3.umt:190:56">next</samp> and
+<samp data-coord="prj3.umt:190:75">href</samp> set to a URL which can be used to get the next
+set of <samp data-coord="prj3.umt:190:137">_count</samp> results.  This link should be present only
+if there are subsequent results for the search.
+</p></li><li data-coord="prj3.umt:195:0"><p data-coord="prj3.umt:195:8">A <em data-coord="prj3.umt:195:10">previous-link</em> with <samp data-coord="prj3.umt:195:31">rel</samp> and <samp data-coord="prj3.umt:195:41">name</samp> both set to <samp data-coord="prj3.umt:195:60">prev</samp> and
+<samp data-coord="prj3.umt:195:79">href</samp> set to a URL which can be used to get the previous
+set of <samp data-coord="prj3.umt:195:145">_count</samp> results.  This link should be present only
+if there are previous results for the search.
+</p></li></ul><p data-coord="prj3.umt:200:4">The last two links can be used for scrolling through search results.
+</p></dd><dt data-coord="prj3.umt:202:2"> <samp data-coord="prj3.umt:202:1">GET</samp> <em data-coord="prj3.umt:202:7">book-item-URL</em> </dt><dd data-coord="prj3.umt:203:0"><p data-coord="prj3.umt:203:4">The <samp data-coord="prj3.umt:203:8">result</samp> property is set to the book identified by
+<em data-coord="prj3.umt:203:63">book-item-URL</em>.  The <samp data-coord="prj3.umt:203:85">links</samp> property should be a list containing
+a single <em data-coord="prj3.umt:203:143">self</em> link.  The response should fail with a 404 error
+if there is no such book.
+</p></dd><dt data-coord="prj3.umt:208:2"> <samp data-coord="prj3.umt:208:1">POST</samp> <em data-coord="prj3.umt:208:8">carts-collection-URL</em> </dt><dd data-coord="prj3.umt:209:0"><p data-coord="prj3.umt:209:4">This should create a new shopping cart.  The response should be
+empty with status 204 <samp data-coord="prj3.umt:209:94">CREATED</samp> with a <samp data-coord="prj3.umt:209:111">Location</samp> header set to
+the URL of the newly created cart.  In the sequel, the URL for an
+individual cart is referred to as the <em data-coord="prj3.umt:209:248">cart-URL</em>.
+</p></dd><dt data-coord="prj3.umt:214:2"> <samp data-coord="prj3.umt:214:1">GET</samp> <em data-coord="prj3.umt:214:7">cart-URL</em> </dt><dd data-coord="prj3.umt:215:0"><p data-coord="prj3.umt:215:4">Display the contents of the specified cart.  A successful
+response should have the following properties:
+</p><dl data-coord="prj3.umt:218:0"><dt data-coord="prj3.umt:218:6"> '_lastModified' </dt><dd data-coord="prj3.umt:219:0"><p data-coord="prj3.umt:219:8">A timestamp giving the time the cart was last modified.
+</p></dd><dt data-coord="prj3.umt:221:6"> <samp data-coord="prj3.umt:221:1">links</samp> </dt><dd data-coord="prj3.umt:222:0"><p data-coord="prj3.umt:222:8">A list containing a single <em data-coord="prj3.umt:222:35">self-link</em>.
+</p></dd><dt data-coord="prj3.umt:224:6"> <samp data-coord="prj3.umt:224:1">result</samp> </dt><dd data-coord="prj3.umt:225:0"><p data-coord="prj3.umt:225:8">A list of the cart items.  Each item should have <samp data-coord="prj3.umt:225:57">sku</samp> and
+<samp data-coord="prj3.umt:225:68">nUnits</samp> properties as well as a <samp data-coord="prj3.umt:225:101">links</samp> property specifying a
+single link with <samp data-coord="prj3.umt:225:149">rel</samp> set to <samp data-coord="prj3.umt:225:162">item</samp>, <samp data-coord="prj3.umt:225:170">name</samp> set to <samp data-coord="prj3.umt:225:184">book</samp> and
+<samp data-coord="prj3.umt:225:196">href</samp> set to the <em data-coord="prj3.umt:225:214">book-item-URL</em> for the book item
+corresponding to the <samp data-coord="prj3.umt:225:270">sku</samp>.
+</p></dd></dl></dd><dt data-coord="prj3.umt:231:2"> <samp data-coord="prj3.umt:231:1">PATCH</samp> <em data-coord="prj3.umt:231:9">cart-URL</em> </dt><dd data-coord="prj3.umt:232:0"><p data-coord="prj3.umt:232:4">This request must have a JSON body giving the <samp data-coord="prj3.umt:232:50">sku</samp> and <samp data-coord="prj3.umt:232:60">nUnits</samp>
+to be updated.  The cart specified by <em data-coord="prj3.umt:232:111">cart-URL</em> is updated with
+the specified <samp data-coord="prj3.umt:232:156">sku</samp> and <samp data-coord="prj3.umt:232:166">nUnits</samp> with a return HTTP status of 204
+<samp data-coord="prj3.umt:232:212">No Content</samp>.  If the <samp data-coord="prj3.umt:232:234">sku</samp> does not correspond to the ISBN of a
+book in the catalog, then the HTTP response should be a <samp data-coord="prj3.umt:232:337">404 Not
+    Found</samp>.
+</p></dd></dl><p data-coord="prj3.umt:239:0">The behavior of the program is illustrated in this <em data-coord="prj3.umt:239:68"><a href="extras/LOG.sh" data-coord="prj3.umt:239:68">annotated log</a></em>.
+</p><p data-coord="prj3.umt:242:0">A working version of these web services can be accessed at the
+<em data-coord="prj3.umt:242:101"><a href="http://zdu.binghamton.edu:2345/api" data-coord="prj3.umt:242:101">&lt;http://zdu.binghamton.edu:2345/api&gt;</a></em>.  Note that this URL
+is accessible only from within the CS network; you should be able
+to access it from your VM.
+</p></section><section data-coord="prj3.umt:248:0"><h2 data-coord="prj3.umt:248:0">Provided Files</h2><p data-coord="prj3.umt:251:0">The <a href="./prj3-sol" data-coord="prj3.umt:251:18">prj3-sol</a> directory contains a start for your
+project.  It contains the following files:
+</p><dl data-coord="prj3.umt:254:0"><dt data-coord="prj3.umt:254:4"> <a href="./prj3-sol/src/ws-server.mjs?colorize=true" data-coord="prj3.umt:254:47">ws-server.mjs</a></dt><dd data-coord="prj3.umt:255:0"><p data-coord="prj3.umt:255:6">A skeleton file for your project.  You should be doing
+all your development in this file.
+</p></dd><dt data-coord="prj3.umt:258:4"> <a href="./prj3-sol/index.mjs?colorize=true" data-coord="prj3.umt:258:39">index.mjs</a></dt><dd data-coord="prj3.umt:259:0"><p data-coord="prj3.umt:259:6">The file invoked on the command-line.  It is a trivial
+wrapper which simply calls <samp data-coord="prj3.umt:259:94">cli.mjs</samp>.
+</p></dd><dt data-coord="prj3.umt:262:4"> <a href="./prj3-sol/src/cli.mjs?colorize=true" data-coord="prj3.umt:262:41">cli.mjs</a></dt><dd data-coord="prj3.umt:263:0"><p data-coord="prj3.umt:263:6">This file provides the complete command-line behavior which is
+required by your program.  It requires
+<a href="./prj3-sol/src/model.mjs?colorize=true" data-coord="prj3.umt:263:162">model.mjs.</a>  You <strong data-coord="prj3.umt:263:178">must
+      not</strong> modify this file; this ensures that your server meets
+its command-line specifications.
+</p></dd><dt data-coord="prj3.umt:269:4"> <a href="./prj3-sol/src/model.mjs?colorize=true" data-coord="prj3.umt:269:43">model.mjs</a></dt><dd data-coord="prj3.umt:270:0"><p data-coord="prj3.umt:270:6">Identical to the skeleton file provided for your previous
+project.  This file has been provided only to ensure
+that the code in the <samp data-coord="prj3.umt:270:150">prj3-sol</samp> directory can be run
+out-of-the-box.  In practice, you will replace the
+file with either that from your solution to Project 2,
+or the class solution for Project 2.
+</p></dd><dt data-coord="prj3.umt:277:4"> <a href="./prj3-sol/src/meta.mjs?colorize=true" data-coord="prj3.umt:277:42">meta.mjs</a></dt><dd data-coord="prj3.umt:278:0"><p data-coord="prj3.umt:278:6">Meta-information about the different model object categories.
+Identical to that provided for your previous project.
+</p></dd><dt data-coord="prj3.umt:281:4"> <a href="./prj3-sol/src/model-error.mjs?colorize=true" data-coord="prj3.umt:281:49">model-error.mjs</a></dt><dd data-coord="prj3.umt:282:0"><p data-coord="prj3.umt:282:6">A trival class for application errors.
+Identical to that provided for your previous project.
+</p></dd><dt data-coord="prj3.umt:285:4"> <a href="./prj3-sol/src/validator.mjs?colorize=true" data-coord="prj3.umt:285:47">validator.mjs</a></dt><dd data-coord="prj3.umt:286:0"><p data-coord="prj3.umt:286:6">Validation code for checking for local errors which depend only
+on a single object instance.  Note that it provides generic
+validation based on types for input parameters.  The model will
+need to perform additional validation for checking for global
+errors across objects.  Identical to that provided for your
+previous project.
+</p></dd><dt data-coord="prj3.umt:294:4"> <a href="./prj3-sol/README" data-coord="prj3.umt:294:22">README</a></dt><dd data-coord="prj3.umt:295:0"><p data-coord="prj3.umt:295:6">A README file which must be submitted along with your project.
+It contains an initial header which you must complete (replace
+the dummy entries with your name, B-number and email address at
+which you would like to receive project-related email).  After
+the header you may include any content which you would like read
+during the grading of your project.
+</p></dd></dl><p data-coord="prj3.umt:302:0">The <em data-coord="prj3.umt:302:18"><a href="../../data" data-coord="prj3.umt:302:18">course data directory</a></em> contains data files which
+can be used to test your project.  It remains unchanged from your
+previous project.
+</p></section><section data-coord="prj3.umt:306:0"><h2 data-coord="prj3.umt:306:0">Hints</h2><p data-coord="prj3.umt:309:0">The following points are worth noting:
+</p><ul data-coord="prj3.umt:311:0"><li data-coord="prj3.umt:311:0"><p data-coord="prj3.umt:311:4">The provided code should pretty much take care of <strong data-coord="prj3.umt:311:54">most</strong> error
+handling.
+</p></li><li data-coord="prj3.umt:314:0"><p data-coord="prj3.umt:314:4">When running your server in the background use bash's <samp data-coord="prj3.umt:314:58">fg</samp> command
+to put it in the foreground.  Once it is in the foreground, you
+can kill it using control-C.
+</p></li><li data-coord="prj3.umt:318:0"><p data-coord="prj3.umt:318:4">Remember that specifying the <samp data-coord="prj3.umt:318:33">DATA_FILE...</samp> arguments when starting
+your server results in all data (including carts) being cleared
+and all books being reloaded from <samp data-coord="prj3.umt:318:178">DATA_FILE...</samp>.  So this is
+not something you want to do when you are working on carts.
+</p></li><li data-coord="prj3.umt:323:0"><p data-coord="prj3.umt:323:4">The JSON produced by the web services is not formatted. If the web
+services are run on the command line using a program like curl,
+the output can be piped through a program like
+<a href="http://manpages.ubuntu.com/manpages/trusty/man1/json_pp.1.html" data-coord="prj3.umt:323:264">json_pp</a> (pre-installed on your VM).  If running directly within
+Chrome (not using some kind of REST client), use a Chrome
+extension like
+<em data-coord="prj3.umt:323:516"><a href="https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en" data-coord="prj3.umt:323:516">JSON Formatter</a></em>.
+</p></li><li data-coord="prj3.umt:333:0"><p data-coord="prj3.umt:333:4">To make development easy, it is useful to not have to manually
+restart the server after each source code change.  Automated
+restarts can be achieved by using a program like
+<a href="https://www.npmjs.com/package/nodemon" data-coord="prj3.umt:333:230">nodemon.</a>  Once <samp data-coord="prj3.umt:333:245">nodemon</samp>
+is installed within your <samp data-coord="prj3.umt:333:284">node_modules</samp> directory, you can start
+your server from the <samp data-coord="prj3.umt:333:349">prj3-sol</samp> directory using something like:
+</p><pre data-coord="prj3.umt:341:0">    $ npx nodemon --watch src \
+        ./index.mjs 2345 mongodb://localhost:27017/books
+</pre><p data-coord="prj3.umt:345:4">and the server will be automatically restarted whenever you make
+changes to JavaScript files in <samp data-coord="prj3.umt:345:104">src</samp>.
+</p><p data-coord="prj3.umt:348:4">The above command assumes that the books have already been loaded
+into the database.  It is usually a bad idea to provide the
+<samp data-coord="prj3.umt:348:138">DATA_FILE</samp> argument, as doing so will result in your database
+being cleared out on every automated restart; this can be rather
+disconcerting if you are attempt to debug shopping carts!
+</p></li></ul><p data-coord="prj3.umt:354:0">The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+</p><ol data-coord="prj3.umt:357:0"><li data-coord="prj3.umt:357:0"><p data-coord="prj3.umt:357:4">Read the project requirements thoroughly.  Look at the
+<em data-coord="prj3.umt:357:80"><a href="extras/LOG.sh" data-coord="prj3.umt:357:80">sample log</a></em> to make sure you understand the
+necessary behavior.  Review the material covered in class
+including the <a href="../../slides/users-ws/code/users-ws" data-coord="prj3.umt:357:244">users-ws</a>
+example.
+</p></li><li data-coord="prj3.umt:363:0"><p data-coord="prj3.umt:363:4">The requirements only specify a single URL <samp data-coord="prj3.umt:363:47">/api</samp>.  Decide
+on the <em data-coord="prj3.umt:363:74">books-collection-URL</em> and the <em data-coord="prj3.umt:363:105">carts-collection-URL</em>.
+</p></li><li data-coord="prj3.umt:366:0"><p data-coord="prj3.umt:366:4">Decide on how you will send HTTP requests to your server.  You can
+do so using a command-line HTTP client like
+<a href="https://curl.haxx.se/" data-coord="prj3.umt:366:148">curl</a> as in the provided <a href="extras/LOG.sh" data-coord="prj3.umt:366:193">log,</a> or a brower client like
+<em data-coord="prj3.umt:366:340"><a href="https://chrome.google.com/webstore/detail/talend-api-tester-free-ed/aejoelaoggembcahagimdiliamlcdmfm?hl=en" data-coord="prj3.umt:366:340">Talend API Tester</a></em> or <a href="https://yet-another-rest-client.com/" data-coord="prj3.umt:366:407">yarc.</a>
+</p></li><li data-coord="prj3.umt:374:0"><p data-coord="prj3.umt:374:4">Set up your <samp data-coord="prj3.umt:374:16">prj3-sol</samp> branch and <samp data-coord="prj3.umt:374:38">submit/prj3-sol</samp> as per
+your previous projects.
+</p></li><li data-coord="prj3.umt:377:0"><p data-coord="prj3.umt:377:4">Install necessary modules.  You will need <samp data-coord="prj3.umt:377:46">mongo</samp>, <samp data-coord="prj3.umt:377:55">express</samp>
+and <samp data-coord="prj3.umt:377:73">body-parser</samp> as runtime dependencies and <samp data-coord="prj3.umt:377:115">nodemon</samp>
+as a development dependency.
+</p></li><li data-coord="prj3.umt:382:0"><p data-coord="prj3.umt:382:4">You should be able to run the project with a usage message
+and the <samp data-coord="prj3.umt:382:75">/api</samp> base URL returning a partial result:
+</p><pre data-coord="prj3.umt:387:0">    $ ./index.mjs 
+    966164
+    usage: index.mjs PORT MONGO_DB_URL [DATA_FILE...]
+    $ ./index.mjs 2345 mongodb://localhost:27017/books &amp;
+    [2] 966196
+    $ 966196
+    listening on port 2345
+
+    $ curl -s http://localhost:2345/api | json_pp
+    {
+       "links" : [
+          {
+            "href" : "http://localhost:2345/api",
+            "name" : "self",
+            "rel" : "self"
+          }
+       ]
+    }
+</pre></li><li data-coord="prj3.umt:407:0"><p data-coord="prj3.umt:407:4">Replace the <samp data-coord="prj3.umt:407:16">XXX</samp> entries in the <samp data-coord="prj3.umt:407:37">README</samp> template and commit your
+project to github.
+</p></li><li data-coord="prj3.umt:410:0"><p data-coord="prj3.umt:410:4">Replace the skeleton <samp data-coord="prj3.umt:410:25">model.mjs</samp> file in your <samp data-coord="prj3.umt:410:50">src</samp> directory with
+one from a solution to Project 2.  You can use one from your
+solution or that from the <em data-coord="prj3.umt:410:191"><a href="../prj2-sol/model.mjs" data-coord="prj3.umt:410:191">provided
+    solution</a></em>.  Note that a model instance generated by the
+<samp data-coord="prj3.umt:410:265">model.mjs</samp> from the provided solution exports a <samp data-coord="prj3.umt:410:314">DEFAULT_COUNT</samp>
+property; this is a somewhat clumsy attempt to avoid violating DRY
+by providing access to the default value for the number of search
+results.
+</p></li><li data-coord="prj3.umt:419:0"><p data-coord="prj3.umt:419:4">Complete the provided <samp data-coord="prj3.umt:419:26">doBase()</samp> handler to add in links for
+the book and cart collections based on the URLs you have chosen.
+</p></li><li data-coord="prj3.umt:422:0"><p data-coord="prj3.umt:422:4">Point a <samp data-coord="prj3.umt:422:12">POST</samp> route to a handler for creating a new shopping
+cart.  
+</p><p data-coord="prj3.umt:425:4">The handler will need to be <samp data-coord="prj3.umt:425:32">async</samp> since it will need to get the
+cart ID by making an asynchronous <samp data-coord="prj3.umt:425:108">newCart()</samp> call to the model
+accessed as <samp data-coord="prj3.umt:425:154">app.locals.model</samp>.  The returned cart ID can be used
+to build up a URL for the newly created cart.  Add a <samp data-coord="prj3.umt:425:265">Location</samp>
+header giving the cart's URL using
+<a href="https://expressjs.com/en/4x/api.html#res.append" data-coord="prj3.umt:425:370">res.append().</a>
+Finally, set the response
+<a href="https://expressjs.com/en/4x/api.html#res.status" data-coord="prj3.umt:425:469">status</a> as per
+the requirements and
+<a href="https://expressjs.com/en/4x/api.html#res.end" data-coord="prj3.umt:425:560">end</a> an empty
+response.
+</p><p data-coord="prj3.umt:437:4">The code for the handler (and all subsequent handlers) should be
+enclosed within a <samp data-coord="prj3.umt:437:91">try-catch</samp> similar to the <samp data-coord="prj3.umt:437:118">try-catch</samp> provided
+for <samp data-coord="prj3.umt:437:147">doBase()</samp>.  Note that you could wrap each handler within an
+<samp data-coord="prj3.umt:437:212">errorWrap()</samp> function as done in the
+<a href="../../slides/users-ws/code/users-ws" data-coord="prj3.umt:437:293">users-ws</a> example, but that
+is not necessary as long as you keep the <samp data-coord="prj3.umt:437:365">catch</samp> block code simple
+enough to avoid exceptions.
+</p><p data-coord="prj3.umt:445:4">When testing, you can use mongo shell to verify that you have
+created a new cart in the database.
+</p></li><li data-coord="prj3.umt:448:0"><p data-coord="prj3.umt:448:4">Set up a <samp data-coord="prj3.umt:448:13">PATCH</samp> handler for updating a cart.  Since different
+carts will have different cart IDs, use express's path patterns to
+allow arbitrary cart IDs.  Extract the cart ID from the request
+URL using <a href="https://expressjs.com/en/4x/api.html#req.params" data-coord="prj3.umt:448:275">req.params.</a>  Since the
+<a href="https://www.npmjs.com/package/body-parser" data-coord="prj3.umt:448:347">body-parser</a> has been
+set up as a JSON parser for all request bodies, you should find an
+object corresponding to the request parameters like <samp data-coord="prj3.umt:448:495">sku</samp> and
+<samp data-coord="prj3.umt:448:509">nUnits</samp> in <samp data-coord="prj3.umt:448:521">req.body</samp>.  Combine these parameters with the cart ID
+extracted from the request path to make a call to the model's
+<samp data-coord="prj3.umt:448:646">cartItem()</samp> method.  
+</p><p data-coord="prj3.umt:460:4">Verify your tests using mongo shell.
+</p></li><li data-coord="prj3.umt:462:0"><p data-coord="prj3.umt:462:4">Set up a <samp data-coord="prj3.umt:462:13">GET</samp> handler for an individual book.  You can call the
+model's <samp data-coord="prj3.umt:462:81">findBooks()</samp> with an <samp data-coord="prj3.umt:462:103">isbn</samp> search parameter containing the
+book's isbn extracted from the request path.  If <samp data-coord="prj3.umt:462:195">findBooks()</samp> does
+not return exactly one book, throw a suitable error.  Build up the
+required response object containing a suitable <samp data-coord="prj3.umt:462:336">links</samp>
+property. Finally deliver the built-up response using
+<a href="https://expressjs.com/en/4x/api.html#res.json" data-coord="prj3.umt:462:455">res.json().</a>
+</p></li><li data-coord="prj3.umt:470:0"><p data-coord="prj3.umt:470:4">Set up a route and handler to display the contents of a cart.
+Retrieve the cart contents by calling <samp data-coord="prj3.umt:470:108">getCart()</samp> on the model.
+Massage the contents into the required format, adding <samp data-coord="prj3.umt:470:192">links</samp>
+properties.
+</p></li><li data-coord="prj3.umt:475:0"><p data-coord="prj3.umt:475:4">Set up a <samp data-coord="prj3.umt:475:13">GET</samp> handler for searching for books by query parameters
+accessed via <a href="https://expressjs.com/en/4x/api.html#req.query" data-coord="prj3.umt:475:142">req.query.</a>  Extract <samp data-coord="prj3.umt:475:162">_count</samp> and <samp data-coord="prj3.umt:475:175">_index</samp> from the query parameters,
+defaulting them to the specified default values if they are
+not present.  These enhanced query parameters can be used as
+parameters to the model's <samp data-coord="prj3.umt:475:370">findBooks()</samp> method except for one
+embellishment which facilitates the <em data-coord="prj3.umt:475:446">next-link</em>.
+</p><p data-coord="prj3.umt:483:4">Recall that the requirements specify that a <em data-coord="prj3.umt:483:48">next-link</em> should be
+present only if there are further results.  Hence set things up so
+that the count provided to <samp data-coord="prj3.umt:483:172">findBooks()</samp> is one greater than the
+requested count.  Then if <samp data-coord="prj3.umt:483:240">findBooks()</samp> returns this larger count
+of results, then the <em data-coord="prj3.umt:483:305">next-link</em> must be generated, otherwise it
+should not be generated.
+</p><p data-coord="prj3.umt:490:4">Set up a response object to contain the returned books with each
+books enhanced with a <samp data-coord="prj3.umt:490:95">links</samp> property for the individual book.
+Set up a top-level <samp data-coord="prj3.umt:490:160">links</samp> property for the response object.  It
+will always contain a self-link.  It should contain a
+<em data-coord="prj3.umt:490:268">previous-link</em> only if the requested <samp data-coord="prj3.umt:490:306">_index</samp> was greater than 0.
+It will contain a <em data-coord="prj3.umt:490:357">next-link</em> as described above.
+</p></li><li data-coord="prj3.umt:497:0"><p data-coord="prj3.umt:497:4">Iterate until you meet all requirements.  
+</p></li></ol><p data-coord="prj3.umt:499:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When complete, please
+follow the procedure given in the
+<em data-coord="prj3.umt:499:214"><a href="../../misc/git-setup/git-setup.html#prj-submit" data-coord="prj3.umt:499:214">git setup</a></em> document
+to merge your <samp data-coord="prj3.umt:499:249">prj1-sol</samp> branch into your <samp data-coord="prj3.umt:499:277">master</samp> branch and submit
+your project to the grader via github.
+</p></section></section>
+    </div> <!-- #content -->
+    <script src="../../assets/scripts/loginAction.js"></script>
+  </body>
+</html>
