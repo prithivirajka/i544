@@ -1,22 +1,20 @@
 {
-  "name": "prj2-sol",
+  "name": "prj3",
   "version": "1.0.0",
-  "description": "",
+  "description": "Name:\t\tMONISH\r B-Number:\tB00817603\r Email:\t\tmdevend1@binghamton.edu",
   "main": "index.js",
-  "type": "module",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongodb": "^3.5.9",
+    "mongo": "^0.1.0",
+    "nodemon": "^2.0.4"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "mongodb": "^3.5.9"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
-  }
+  "license": "ISC"
 }

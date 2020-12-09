@@ -90,7 +90,7 @@ function doCreate(app){
   return async function(req, res) {
     try {
       const result = await app.locals.model.newCart({});
-      res.append('Location', requestUrl(req) + '/'+ ${result});
+      res.append('Location', requestUrl(req) + '/'+ result);
       res.sendStatus(CREATED);
       res.end();
     }
@@ -150,14 +150,14 @@ function doGetCart(app) {
       const cart = await app.locals.model.getCart({ cartId: id });
       if (cart.length === 0) {
         res.json( {
-          "errors" : [
+          errors : [
             {
               "code" : "BAD_ID",
               "message" : "cart id not found "+id,
               "name" : "cartId"
             }
           ],
-          "status" : 404
+          status : 404
         });
       }
       else {
@@ -165,11 +165,11 @@ function doGetCart(app) {
         delete cart._lastModified
         const items = []
         for (var key of Object.keys(cart)) {
-            let temp = { }
-            temp["links"] = [ { rel: 'item', name: 'book', href: req.baseUrl+"/books/"+key} ]
-            temp["sku"] = key;
-            temp["nUnits"] = cart[key]
-            items.push(temp)
+          temp.push({
+            links = [ { rel: 'item', name: 'book', href: req.baseUrl+"/books/"+key} ],
+            nUnits = key,
+            sku : key 
+          })
         }
         response.cart = items
         res.json(response)
